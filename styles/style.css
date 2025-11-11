@@ -1,0 +1,199 @@
+:root {
+  --background-color: #0c0c0c;
+  --background-panel-color: #1a1a1a;
+  --font-color: #eee;
+  --primary-color: #76ff7a;
+  --primary-background-color: #2d662d;
+  --warning-color: #ff7676;
+  --warning-background-color: #662d2d;
+  --active-background-color: #662d2d55;
+  --reserverd-color: #4faa52;
+
+  --team-A-color: #fff676;
+  --team-A-background-color: #65662d;
+  --team-B-color: #b676ff;
+  --team-B-background-color: #4f2d66;
+
+  --gap-small: 4px;
+  --gap: 10px;
+
+  --rule-width: 211px;
+}
+
+/* General layout */
+body {
+  font-family: sans-serif;
+  background: var(--background-color);
+  color: var(--font-color);
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  margin: 0;
+  box-sizing: content-box;
+}
+
+header {
+  background: var(--background-panel-color);
+  padding: var(--gap);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  overflow: hidden;
+  position: relative;
+  background: var(--background-color);
+  overflow: hidden;
+}
+
+hr {
+  color: var(--background-color);
+}
+
+#editorPanel {
+  background: var(--background-panel-color);
+  padding: var(--gap);
+  overflow-y: auto;
+  display: flex;
+  gap: var(--gap);
+}
+
+canvas {
+  width: 800px;
+  height: 400px;
+}
+
+.reservedword.reservedword.reservedword{
+  color: var(--reserverd-color);
+  font-size: 0.7em;
+}
+
+.warning.warning.warning{
+  color: var(--warning-color);
+  background-color: var(--warning-background-color);
+}
+
+.fixed.fixed.fixed{
+  opacity: 0.8;
+  font-style: italic;
+  font-size: 0.8em;
+}
+
+button {
+  background: var(--team-A-background-color);
+  border: none;
+  border-radius: var(--gap-small);
+  color: var(--font-color);
+  padding: auto;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+button:hover {
+  opacity: 1;
+}
+
+
+/* Player Instruction Component */
+.player-instructions {
+  border: thin solid var(--background-color);
+  background: var(--background-color);
+  padding: var(--gap);
+  border-radius: var(--gap);
+  margin-bottom: var(--gap);
+}
+
+.player-instructions hr {
+  width: calc(var(--rule-width) + var(--gap));
+}
+
+.player-instructions h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: var(--primary-color);
+  color: var(--team-A-color);
+}
+
+.player-instructions section {
+  display: flex;
+}
+
+.player-instructions article  {
+  background: var(--background-panel-color);
+  border: thin solid var(--background-color);
+  padding: var(--gap);
+}
+.player-instructions .myteamhasball {
+  border-radius: var(--gap) 0px 0px var(--gap);
+}
+.player-instructions .myteamdonthasball {
+  border-radius: 0px var(--gap) var(--gap) 0px;
+}
+
+.rule-item {
+  border-radius: var(--gap-small);
+  padding: var(--gap-small);
+  background: var(--background-color);
+  display: block;
+  min-width: var(--rule-width);
+}
+
+.player-instructions .active  {
+  background: var(--active-background-color);
+}
+
+.player-instructions .defaultaction .active  {
+  background: var(--background-color);
+  color: var(--active-background-color);
+}
+
+.rule-item select {
+  background: #0000;
+  color: var(--font-color);
+  border: 1px solid #444;
+  border-radius: var(--gap-small);
+  padding: var(--gap-small);
+}
+
+.btn-add-rule{
+  float: right;
+  display: block;
+  margin-left: var(--gap);
+  margin-top: var(--gap);
+}
+
+.rules-container{
+  min-height: var(--gap);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-small);
+}
+
+
+.team-formation {
+  padding: var(--gap);
+  display: flex;
+  gap: var(--gap);
+}
+
+.team-formation h2 {
+  color: var(--team-A-color);
+}
+
+.players-wrapper {
+  display: flex;
+  gap: var(--gap);
+}
+
+.team-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+

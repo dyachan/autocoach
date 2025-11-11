@@ -1,0 +1,338 @@
+import { Player } from "../models/Player.js";
+
+export class MatchSimulationComponent {
+  PLAYER_SIZE = 38;
+
+  constructor() {
+    this.canvas = document.getElementById("gameCanvas");
+    if (!this.canvas) throw new Error(`Canvas not found`);
+
+    this.ctx = this.canvas.getContext("2d");
+    this.width = this.canvas.width = this.canvas.clientWidth;
+    this.height = this.canvas.height = this.canvas.clientHeight;
+
+    this.teamA = null;
+    this.teamB = null;
+
+    this.players = [];
+    this.ball = { x: this.width / 2, y: this.height / 2, vx: 0, vy: 0 };
+    this.gameLoopId = null;
+
+    // Event listeners map
+    this.listeners = {};
+
+    // this.canvas.addEventListener("click", (evt) => {
+    //   console.log(evt);
+    // });
+
+    this.pause = false;
+    document.getElementById("pausebutton").addEventListener("click", ()=>{
+      if(this.pause){
+        this.start();
+      } else {
+        this.stop();
+      }
+      this.pause = !this.pause;
+    });
+  }
+
+  // Basic pub/sub
+  on(event, callback) {
+    if (!this.listeners[event]) this.listeners[event] = [];
+    this.listeners[event].push(callback);
+  }
+
+  emit(event, data) {
+    if (this.listeners[event]) {
+      this.listeners[event].forEach(cb => cb(data));
+    }
+  }
+
+  /** Initialize both teams using their JSON data */
+  loadTeams(teamAData, teamBData) {
+    this.teamA = teamAData;
+    this.teamB = teamBData;
+
+    this.players = [];
+
+    const initialPositions = [
+        {x: this.width*0.25, y: this.height*0.5},
+        {x: this.width*0.4, y: this.height*0.3},
+        {x: this.width*0.4, y: this.height*0.7}
+    ];
+    const basePositions = [
+        {x: this.width*0.1, y: this.height*0.5},
+        {x: this.width*0.65, y: this.height*0.2},
+        {x: this.width*0.65, y: this.height*0.8}
+    ];
+
+    // create players for Team A (left)
+    teamAData.players.forEach((p, i) => {
+      const player = new Player({
+        team: this.teamA.teamName,
+        name: p.name,
+        rules: p.rules,
+        x: initialPositions[i].x,
+        y: initialPositions[i].y,
+        baseX: basePositions[i].x,
+        baseY: basePositions[i].y,
+        defaultAction: "Keep in my zone",
+        currentFieldSide: "left"
+      });
+      this.players.push(player);
+    });
+
+    // create players for Team B (right)
+    teamBData.players.forEach((p, i) => {
+      const player = new Player({
+        team: this.teamB.teamName,
+        name: p.name,
+        rules: p.rules,
+        x: this.width - initialPositions[i].x,
+        y: initialPositions[i].y,
+        baseX: this.width - basePositions[i].x,
+        baseY: basePositions[i].y,
+        defaultAction: "Keep in my zone",
+        currentFieldSide: "right"
+      });
+      this.players.push(player);
+    });
+
+    this.ball = { x: this.width / 2, y: this.height / 2, vx: 0, vy: 0 };
+  }
+
+  start() {
+    if (this.gameLoopId) cancelAnimationFrame(this.gameLoopId);
+    this.emit("teamHasBall", {team: ""});
+    this.loop();
+  }
+
+  stop() {
+    if (this.gameLoopId) cancelAnimationFrame(this.gameLoopId);
+  }
+
+  loop = () => {
+    this.update();
+    this.render();
+    this.gameLoopId = requestAnimationFrame(this.loop);
+  };
+
+  update(dt=1) {
+    // basic ball motion
+    this.ball.x += this.ball.vx;
+    this.ball.y += this.ball.vy;
+    this.ball.vx *= 0.98;
+    this.ball.vy *= 0.98;
+
+    // clamp ball within field
+    // this.ball.x = Math.max(10, Math.min(this.width - 10, this.ball.x));
+    this.ball.y = Math.max(10, Math.min(this.height - 10, this.ball.y));
+    const balloffset = this.PLAYER_SIZE * 0.5 + 3;
+    if(this.ball.x < balloffset || this.ball.x > this.width - balloffset){
+      this.ball.x = this.width * 0.5;
+      this.ball.y = this.height * 0.5;
+      this.ball.vx = 0;
+      this.ball.vy = 0;
+      this.players.forEach( (p) => p.hasBall = false );
+      this.emit("teamHasBall", {team: ""});
+    }
+
+    // players logic
+    for (const player of this.players) {
+      const simState = {
+        ball: this.ball,
+        fieldWidth: this.width,
+        fieldHeight: this.height,
+        teammates: this.players.filter(p => p.team === player.team && p !== player),
+        opponents: this.players.filter(p => p.team !== player.team && p.bodyCooldown <= 0),
+        ballTeam: this.players.find(p => p.hasBall)?.team
+      };
+
+      player.checkMarked(simState.opponents);
+      const action = player.decide(simState);
+      player.execute(
+        simState,
+        ({x, y}) => {this.applyForceToBall({x, y}, 6)},
+        ({x, y}) => {this.applyForceToBall({x, y}, 10)}
+      );
+      player.update(dt);
+
+      // colision between players
+      for (const otherPlayer of this.players) {
+        if (otherPlayer === player || otherPlayer.bodyCooldown > 0) continue;
+
+        const dx2 = player.x - otherPlayer.x;
+        const dy2 = player.y - otherPlayer.y;
+        const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+
+        if (dist2 < this.PLAYER_SIZE*0.6 && dist2 > 0) {
+          // push player away
+          const overlap = this.PLAYER_SIZE*0.6 - dist2;
+          player.x += (dx2 / dist2) * (overlap / 2);
+          player.y += (dy2 / dist2) * (overlap / 2);
+  
+          // also push other player
+          otherPlayer.x -= (dx2 / dist2) * (overlap / 2);
+          otherPlayer.y -= (dy2 / dist2) * (overlap / 2);
+        }
+      }
+    }
+
+    // check ball posesion
+    // If ball dont has player and only one player is near, ball will be for that player.
+    // If ball dont has player and at last one player of each team is near, the ball wil jump to a near zone.
+    // If the ball has a player and also an opponent player is near, the ball must be disputed.
+    // In the ball is disputed, the opponet player will has a Math.random() < 0.2 of chance to keep with the ball,
+    // and a Math.random() < 0.5 to make the ball jump to a near zone.
+
+    const CONTROL_DISTANCE = this.PLAYER_SIZE * 0.5 + 1;
+
+    // Find players near the ball
+    const nearPlayers = this.players.filter(p => {
+      const dx = p.x - this.ball.x;
+      const dy = p.y - this.ball.y;
+      const dist = Math.hypot(dx, dy);
+      return p.ballCooldown <= 0 && dist < CONTROL_DISTANCE;
+    });
+
+    // If the ball currently has an owner
+    const currentOwner = this.players.find(p => p.hasBall);
+
+    let currentOwnerFeedback = "free";
+    if (currentOwner) {
+      const opponentsClose = nearPlayers.filter(p => p.team !== currentOwner.team && p.bodyCooldown <= 0);
+      currentOwnerFeedback = currentOwner.team + " " + currentOwner.name;
+
+      // each opponent will try to get the ball
+      for(const opponent of opponentsClose){
+        // There is a challenge for the ball
+        const chance = Math.random();
+        if (chance < 0.2) {
+          // Opponent steals the ball
+          currentOwner.hasBall = false;
+          currentOwner.ballCooldown = 60;
+          currentOwner.bodyCooldown = 60;
+
+          opponent.hasBall = true;
+          this.ball.x = opponent.x;
+          this.ball.y = opponent.y;
+          this.ball.vx = 0;
+          this.ball.vy = 0;
+
+          this.emit("teamHasBall", {team: opponent.team});
+          currentOwnerFeedback = opponent.team + " " + opponent.name;
+          break;
+
+        } else if (chance < 0.5) {
+          // Ball is deflected to a nearby random zone
+          currentOwner.hasBall = false;
+          currentOwner.ballCooldown = 20;
+          opponent.ballCooldown = 20;
+          this.applyForceToBall({
+              x: this.ball.x + (Math.random() - 0.5) * 200,
+              y: this.ball.y + (Math.random() - 0.5) * 200
+            }, 4);
+          currentOwnerFeedback = "free";
+          break;
+
+        } else {
+          opponent.ballCooldown = 60;
+          opponent.bodyCooldown = 60;
+        }
+      }
+
+      if(currentOwner.hasBall){
+        this.ball.x = currentOwner.x;
+        this.ball.y = currentOwner.y;
+      }
+    } else {
+      // No one currently has the ball
+      if (nearPlayers.length === 1) {
+        // Single player near the ball gains control
+        const newOwner = nearPlayers[0];
+        newOwner.hasBall = true;
+        this.ball.x = newOwner.x;
+        this.ball.y = newOwner.y;
+        this.ball.vx = 0;
+        this.ball.vy = 0;
+        this.emit("teamHasBall", {team: newOwner.team});
+        currentOwnerFeedback = newOwner.team + " " + newOwner.name;
+      } else if (nearPlayers.length > 1) {
+        // Contest between teams → ball bounces away
+        nearPlayers.forEach( (p) => p.ballCooldown = 20 );
+        this.applyForceToBall({
+          x: this.ball.x + (Math.random() - 0.5) * 200,
+          y: this.ball.y + (Math.random() - 0.5) * 200
+        }, 3);
+      }
+    }
+
+    // visual feedback
+    document.getElementById("ballteam").textContent = currentOwnerFeedback;
+    for (const player of this.players) {
+      this.emit("rule", {player: player, condition: player.currentCondition || "Default"});
+    }
+  }
+
+  applyForceToBall(target, force){
+    const dx = target.x - this.ball.x;
+    const dy = target.y - this.ball.y;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist === 0) return; // avoid NaN
+
+    this.ball.vx = (dx / dist) * force;
+    this.ball.vy = (dy / dist) * force;
+
+    this.emit("teamHasBall", {team: ""});
+  }
+
+  render() {
+    const ctx = this.ctx;
+    ctx.clearRect(0, 0, this.width, this.height);
+
+    // field
+    ctx.fillStyle = "#0b5d0b";
+    ctx.fillRect(0, 0, this.width, this.height);
+
+    // center line
+    ctx.strokeStyle = "#ffffff44";
+    ctx.beginPath();
+    ctx.moveTo(this.width / 2, 0);
+    ctx.lineTo(this.width / 2, this.height);
+    ctx.stroke();
+
+    // goals
+    ctx.fillStyle = "#222";
+    ctx.fillRect(0, this.height / 2 - 30, 10, 60);
+    ctx.fillRect(this.width - 10, this.height / 2 - 30, 10, 60);
+
+    // players
+    for (const p of this.players) {
+      ctx.beginPath();
+      ctx.fillStyle = p.team === "Team A" ? "#65662d" : "#4f2d66";
+      if(p.bodyCooldown > 0 || p.ballCooldown > 0){
+        ctx.arc( p.x, p.y, this.PLAYER_SIZE*0.5, 0, Math.max(0, Math.PI * 2 - Math.max(p.bodyCooldown, p.ballCooldown)*0.3) );
+        ctx.fill();
+        ctx.fillStyle += "55";
+      }
+      ctx.arc(p.x, p.y, this.PLAYER_SIZE*0.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      if(p.marked){
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "#5d0b0b55";
+        ctx.stroke();
+      }
+      ctx.fillStyle = "#fff";
+      ctx.font = "10px sans-serif";
+      ctx.fillText(p.name[0], p.x - 3, p.y + 3);
+    }
+
+    // ball
+    ctx.beginPath();
+    ctx.fillStyle = "#fff";
+    ctx.arc(this.ball.x, this.ball.y, this.PLAYER_SIZE*0.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}

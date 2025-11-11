@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoCoach Prototype</title>
+  <link rel="stylesheet" href="./styles/style.css" />
+</head>
+<body>
+  <header>
+    <!-- <div id="controls"></div> -->
+    <div id="editorPanel"></div>
+    <button id="btn-init-match">Iniciar</button>
+  </header>
+
+  <main>
+    <canvas id="gameCanvas"></canvas>
+    <span>Ball: </span><span id="ballteam"></span>
+    <button id="pausebutton">pause</button>
+  </main>
+
+  <!-- ============================= -->
+  <!-- Templates Section -->
+  <!-- ============================= -->
+
+  <!-- Team Formation Template -->
+  <template id="tpl-team-formation">
+    <div class="team-formation">
+      <div class="team-controls">
+        <h2 class="team-name">Team</h2>
+        <textarea class="import-area"></textarea>
+        <button class="btn-import-team">Import Team JSON</button>
+        <button class="btn-export-team">Export Team JSON</button>
+      </div>
+      <div class="players-wrapper"></div>
+    </div>
+  </template>
+
+  <!-- Player Instruction Template -->
+  <template id="tpl-player-instruction">
+    <section class="player-instructions">
+      <h3 class="player-name">Player</h3>
+
+      <section>
+          <article class="myteamhasball">
+            <span class="reservedword">WHILE </span><span class="fixed"> Team has ball </span>
+            <button class="btn-add-rule">+ Add Rule</button>
+            <hr>
+            <div class="rules-container"></div>
+            <span class="reservedword">DEFAULT </span><span class="defaultaction fixed"></span>
+          </article>
+          <article class="myteamdonthasball">
+            <span class="reservedword">ELSE</span>
+            <button class="btn-add-rule">+ Add Rule</button>
+            <hr>
+            <div class="rules-container"></div>
+            <span class="reservedword">DEFAULT </span><span class="defaultaction fixed"></span>
+          </article>
+      </section>
+    </section>
+  </template>
+
+  <!-- Rule Item Template -->
+  <template id="tpl-rule-item">
+    <div class="rule-item">
+      <button class="btn-up">▲</button>
+      <span class="reservedword">IF</span>
+      <select class="rule-condition"></select>
+      <br />
+      <button class="btn-down">▼</button>
+      <span class="reservedword">THEN</span>
+      <select class="rule-action"></select>
+      <button class="btn-delete warning">✖</button>
+    </div>
+  </template>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
