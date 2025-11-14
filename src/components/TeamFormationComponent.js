@@ -47,14 +47,33 @@ export class TeamFormationComponent {
     // players wrapper where PlayerInstructionComponents will be mounted
     const playersWrapper = container.querySelector(".players-wrapper");
 
+    let basePositions = [
+      {x: 10, y: 50},
+      {x: 65, y: 20},
+      {x: 65, y: 80}
+    ];
+    if(this.teamName === "Team B"){
+      basePositions = [
+        {x: 90, y: 50},
+        {x: 35, y: 20},
+        {x: 35, y: 80}
+      ];
+    }
+
     // create the 3 player instruction components and mount their UI
     this.roles.forEach((role, idx) => {
       const playerComp = new PlayerInstructionComponent(
         role,
         this.conditions,
         this.actions,
+        basePositions[idx],
         () => this.triggerUpdate()
       );
+      if(this.teamName === "Team A"){
+        playerComp.setTeamColor("teamacolor", "teamabgcolor");
+      } else {
+        playerComp.setTeamColor("teambcolor", "teambbgcolor");
+      }
 
       playersWrapper.appendChild(playerComp.root);
       this.players.push(playerComp);
@@ -63,25 +82,35 @@ export class TeamFormationComponent {
     // wire import/export buttons from the template
     const btnExport = container.querySelector(".btn-export-team");
     const btnImport = container.querySelector(".btn-import-team");
+    btnExport.addEventListener("click", () => this.exportTeam());
+    btnImport.addEventListener("click", () => this.importTeam());
 
-    if (btnExport) {
-      btnExport.addEventListener("click", () => this.exportTeam());
+    if(this.teamName === "Team A"){
+      titleEl.classList.add("teamacolor");
+      btnExport.classList.add("teamabgcolor");
+      btnImport.classList.add("teamabgcolor");
+    } else {
+      titleEl.classList.add("teambcolor");
+      btnExport.classList.add("teambbgcolor");
+      btnImport.classList.add("teambbgcolor");
     }
-
-    if (btnImport) {
-      btnImport.addEventListener("click", () => this.importTeam());
-    }
-
+    
     this.root = container;
+    
+    if(localStorage.getItem(this.teamName)){
+      this.root.querySelector(".import-area").value = localStorage.getItem(this.teamName);
+      this.importTeam();
+    }
     return container;
   }
 
   getTeamData() {
     const team = {
-      teamName: this.teamName,
+      // teamName: this.teamName,
       players: this.players.map((p) => ({
         name: p.playerName,
         rules: p.getRules(),
+        defaultZone: p.getDefaultZoneValues()
       })),
     };
     return team;
@@ -92,29 +121,32 @@ export class TeamFormationComponent {
     teamData.players.forEach((pd, idx) => {
       if (this.players[idx]) {
         this.players[idx].loadRules(pd.rules || [[],[]]);
+        this.players[idx].defaultZone = pd.defaultZone;
+        this.players[idx].setDefaultZoneValues();
       }
     });
     this.triggerUpdate();
   }
 
   exportTeam() {
-    const data = JSON.stringify(this.getTeamData(), null, 2);
+    const data = JSON.stringify(this.getTeamData());
     this.root.querySelector(".import-area").value = data;
 
     // manza pilleria
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${this.teamName.replace(/\s+/g, "_")}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    // const blob = new Blob([data], { type: "application/json" });
+    // const url = URL.createObjectURL(blob);
+    // const a = document.createElement("a");
+    // a.href = url;
+    // a.download = `${this.teamName.replace(/\s+/g, "_")}.json`;
+    // document.body.appendChild(a);
+    // a.click();
+    // a.remove();
+    // URL.revokeObjectURL(url);
   }
 
   importTeam() {
     this.loadTeamData(JSON.parse(this.root.querySelector(".import-area").value || "[]"));
+    localStorage.setItem(this.teamName, this.root.querySelector(".import-area").value);
   }
 
   triggerUpdate() {

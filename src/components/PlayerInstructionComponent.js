@@ -1,11 +1,14 @@
 export class PlayerInstructionComponent {
-  constructor(playerName, conditions, actions, onUpdate) {
+  constructor(playerName, conditions, actions, defaultZone, onUpdate) {
     this.playerName = playerName;
     this.conditions = conditions;
     this.actions = actions;
+    this.defaultZone = defaultZone;
     this.onUpdate = onUpdate;
     this.rules = [];
     this.myTeamHasBall = false;
+    this.teamColor = null;
+    this.teamBackground = null;
     
     this.root = null;
     this.rulesContainer = null;
@@ -77,7 +80,26 @@ export class PlayerInstructionComponent {
     });
 
     this.root = container;
+    this.setDefaultZoneValues();
     return container;
+  }
+
+  setTeamColor(colorClass, bgColorClass){
+    this.teamColor = colorClass;
+    this.teamBackground = bgColorClass;
+    this.root.querySelector(".player-name").classList.add(colorClass);
+    this.root.querySelectorAll(".btn-add-rule").forEach( (b) => b.classList.add(bgColorClass) );
+  }
+
+  setDefaultZoneValues(){
+    this.root.querySelector(".defaultzonex").value = this.defaultZone.x;
+    this.root.querySelector(".defaultzoney").value = this.defaultZone.y;
+  }
+  getDefaultZoneValues(){
+    return {
+      x: this.root.querySelector(".defaultzonex").value,
+      y: this.root.querySelector(".defaultzoney").value
+    };
   }
 
   /** Create a new rule row */
@@ -117,12 +139,14 @@ export class PlayerInstructionComponent {
       this.triggerUpdate();
     });
 
+    btnUp.classList.add(this.teamBackground);
     btnUp.addEventListener("click", () => {
       const prev = ruleEl.previousElementSibling;
       if (prev) ruleEl.closest(".rules-container").insertBefore(ruleEl, prev);
       this.triggerUpdate();
     });
 
+    btnDown.classList.add(this.teamBackground);
     btnDown.addEventListener("click", () => {
       const next = ruleEl.nextElementSibling;
       if (next) ruleEl.closest(".rules-container").insertBefore(next, ruleEl);

@@ -25,31 +25,37 @@ import { MatchSimulationComponent } from "./components/MatchSimulationComponent.
 
 const conditions = [
     "I has the ball",
+    "I am near a rival",
     "The ball is near my goal",
     "The ball is in my side",
     "The ball is in other side",
     "The ball is near rival goal",
-    "I am near a rival"
+    "Rival in my side",
+    "No rival in my side"
 ];
 const actions = [
     "Keep in my zone",
     "Go to the ball",
+    "Go to my goal",
     "Go to rival goal",
+    "Go forward",
+    "Go back",
     "Pass the ball",
     "Shoot to goal",
-    "Change side",
-    "Go forward"
+    "Change side"
 ]
 
 let teamA = new TeamFormationComponent("Team A", conditions, actions);
 document.getElementById("editorPanel").appendChild(teamA.root);
 let teamB = new TeamFormationComponent("Team B", conditions, actions);
 document.getElementById("editorPanel").appendChild(teamB.root);
+teamB.root.style.display = "none";
 
 let match = new MatchSimulationComponent();
 document.getElementById("btn-init-match").addEventListener("click", () => {
   match.loadTeams(teamA.getTeamData(), teamB.getTeamData());
   match.start();
+  document.getElementById("log").addLog("-----------------------");
 });
 
 match.on("teamHasBall", ({ team }) => {
@@ -66,9 +72,15 @@ match.on("teamHasBall", ({ team }) => {
 });
 
 match.on("rule", ({ player, condition }) => {
-  if(player.team === "Team B"){
+  if(player.team === "Team A"){
     teamA.setCurrentRule(player, condition)
   } else {
     teamB.setCurrentRule(player, condition)
   }
 });
+
+// log system
+document.getElementById("log").addLog = function(log){
+  log = log.replace("Team A", "<span class='teamacolor'>Team A</span>").replace("Team B", "<span class='teambcolor'>Team B</span>");
+  document.getElementById("log").innerHTML = log + "<br>" + document.getElementById("log").innerHTML;
+};

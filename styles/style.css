@@ -9,15 +9,15 @@
   --active-background-color: #662d2d55;
   --reserverd-color: #4faa52;
 
-  --team-A-color: #fff676;
-  --team-A-background-color: #65662d;
+  --team-A-color: #fd9946;
+  --team-A-background-color: #70431e;
   --team-B-color: #b676ff;
   --team-B-background-color: #4f2d66;
 
   --gap-small: 4px;
   --gap: 10px;
 
-  --rule-width: 211px;
+  --rule-width: 230px;
 }
 
 /* General layout */
@@ -44,16 +44,20 @@ header {
 
 main {
   flex: 1;
-  display: grid;
-  grid-template-columns: 350px 1fr;
+  display: flex;
+  flex-direction: row;
   overflow: hidden;
   position: relative;
   background: var(--background-color);
-  overflow: hidden;
+  gap: var(--gap);
 }
 
 hr {
   color: var(--background-color);
+}
+
+h2 {
+  margin: 0%;
 }
 
 #editorPanel {
@@ -86,7 +90,7 @@ canvas {
 }
 
 button {
-  background: var(--team-A-background-color);
+  background: var(--primary-background-color);
   border: none;
   border-radius: var(--gap-small);
   color: var(--font-color);
@@ -113,11 +117,11 @@ button:hover {
   width: calc(var(--rule-width) + var(--gap));
 }
 
-.player-instructions h3 {
+.player-instructions .player-name {
   margin-top: 0;
   margin-bottom: 8px;
+  font-size: 1.2em;
   color: var(--primary-color);
-  color: var(--team-A-color);
 }
 
 .player-instructions section {
@@ -142,6 +146,7 @@ button:hover {
   background: var(--background-color);
   display: block;
   min-width: var(--rule-width);
+  border: thin solid var(--background-color);
 }
 
 .player-instructions .active  {
@@ -154,9 +159,9 @@ button:hover {
 }
 
 .rule-item select {
-  background: #0000;
+  background: var(--background-color);
   color: var(--font-color);
-  border: 1px solid #444;
+  border: 1px solid var(--background-panel-color);
   border-radius: var(--gap-small);
   padding: var(--gap-small);
 }
@@ -179,11 +184,8 @@ button:hover {
 .team-formation {
   padding: var(--gap);
   display: flex;
+  flex-direction: column;
   gap: var(--gap);
-}
-
-.team-formation h2 {
-  color: var(--team-A-color);
 }
 
 .players-wrapper {
@@ -193,7 +195,40 @@ button:hover {
 
 .team-controls {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: var(--gap);
 }
 
+.matchpanel{
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  align-items: center;
+}
+
+.matchpanel fieldset{
+  width: 400px;
+  height: 400px;
+  overflow-y: scroll;
+}
+
+.teamacolor.teamacolor.teamacolor{
+  color: var(--team-A-color);
+}
+.teambcolor.teambcolor.teambcolor{
+  color: var(--team-B-color);
+}
+.teamabgcolor.teamabgcolor.teamabgcolor{
+  background: var(--team-A-background-color);
+}
+.teambbgcolor.teambbgcolor.teambbgcolor{
+  background: var(--team-B-background-color);
+}
+
+input {
+  background: var(--background-color);
+  color: var(--font-color);
+  border: 1px solid var(--background-panel-color);
+  border-radius: var(--gap-small);
+  padding: var(--gap-small);
+}

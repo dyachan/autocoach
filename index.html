@@ -8,29 +8,58 @@
 </head>
 <body>
   <header>
-    <!-- <div id="controls"></div> -->
     <div id="editorPanel"></div>
-    <button id="btn-init-match">Iniciar</button>
   </header>
-
+  
   <main>
-    <canvas id="gameCanvas"></canvas>
-    <span>Ball: </span><span id="ballteam"></span>
-    <button id="pausebutton">pause</button>
+    <section class="matchpanel">
+      <canvas id="gameCanvas"></canvas>
+      <article>
+        <span id="teamascore">0</span>
+        <span class="teamacolor"> Team A </span>
+        <span class="teambcolor"> Team B </span>
+        <span id="teambscore">0</span>
+      </article>
+    </section>
+    <section class="matchpanel">
+      <article class="matchcontrols">
+        <button id="btn-init-match">Cargar</button>
+        <button id="pausebutton">> / ||</button>
+      </article>
+      <article class="matchinfo">
+        <span>Ball: </span><span id="ballteam"></span>
+        <fieldset id="log">
+          <legend>Log:</legend>
+        </fieldset>
+      </article>
+    </section>
   </main>
 
   <!-- ============================= -->
   <!-- Templates Section -->
   <!-- ============================= -->
 
+  <script>
+    function toggleTeam(){
+      document.querySelectorAll(".team-formation").forEach( (tf) => {
+        if(tf.style.display === "none"){
+          tf.style.display = null;
+        } else {
+          tf.style.display = "none";
+        }
+      });
+    }
+  </script>
+
   <!-- Team Formation Template -->
   <template id="tpl-team-formation">
     <div class="team-formation">
       <div class="team-controls">
+        <button class="btn-change-team" onclick="toggleTeam()">Other team</button>
         <h2 class="team-name">Team</h2>
-        <textarea class="import-area"></textarea>
-        <button class="btn-import-team">Import Team JSON</button>
         <button class="btn-export-team">Export Team JSON</button>
+        <input class="import-area"></input>
+        <button class="btn-import-team">Import Team JSON</button>
       </div>
       <div class="players-wrapper"></div>
     </div>
@@ -39,7 +68,10 @@
   <!-- Player Instruction Template -->
   <template id="tpl-player-instruction">
     <section class="player-instructions">
-      <h3 class="player-name">Player</h3>
+      <label class="player-name">Player</label>
+      <span class="reservedword">DEFAULT ZONE</span>
+      <input class="defaultzonex" type="number" min="0" max="100"></input>%
+      <input class="defaultzoney" type="number" min="0" max="100"></input>%
 
       <section>
           <article class="myteamhasball">

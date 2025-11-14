@@ -47,7 +47,7 @@ export class Player {
 
   /** Move toward a target point */
   moveToward(dt = 1) {
-    if (!this.target) return;
+    if (!this.target || this.bodyCooldown > 0) return;
 
     const acceleration = 0.2;
     const deceleration = 0.3;
@@ -101,7 +101,7 @@ export class Player {
   }
 
   /** Update the “marked” status */
-  checkMarked(opponents, markRadius = 30) {
+  checkMarked(opponents, markRadius) {
     this.marked = opponents.some(op => this.distanceTo(op) < markRadius);
     return this.marked;
   }
@@ -110,12 +110,13 @@ export class Player {
   decide(simState) {
     // simState = { ball, teammates, opponents, fieldWidth, fieldHeight }
     for (const rule of this.rules[simState.ballTeam === this.team ? 0 : 1]) {
-      if (this.evaluateCondition(rule.condition, simState)) {
+      if (this.evaluateCondition(rule.condition, rule.action, simState)) {
         this.currentCondition = rule.condition;
         this.currentAction = rule.action;
         return rule.action;
       }
     }
+    this.currentCondition = null;
     this.currentAction = this.defaultAction;
     return this.currentAction;
   }
@@ -133,20 +134,64 @@ export class Player {
         this.target = { x: ball.x, y: ball.y };
         break;
 
+      case "Go to my goal":
+        this.target = {x: (this.currentFieldSide === "left" ? 10 : fieldWidth-10), y: fieldHeight / 2};
+        break;
+
       case "Go to rival goal":
         this.target = {x: (this.currentFieldSide === "left" ? fieldWidth-10 : 10), y: fieldHeight / 2};
         break;
 
+      case "Go forward":
+        this.target = {x: (this.currentFieldSide === "left" ? fieldWidth-10 : 10), y: this.y};
+        break;
+
+      case "Go back":
+        this.target = {x: (this.currentFieldSide === "left" ? 10 : fieldWidth-10), y: this.y};
+        break;
+
       case "Pass the ball":
         // find free mate
-        if(this.hasBall){
-          const freemates = teammates.filter(p => !p.marked);
-          if(freemates.length > 0){
-            this.ballCooldown = 20;
-            this.hasBall = false;
-            // const fm = freemates[freemates.length - 1]; // prefer advanced mates
-            const fm = freemates[Math.floor(Math.random() * freemates.length)];
-            passToCB({x: fm.x, y: fm.y});
+        if (this.hasBall) {
+          // Filter out marked teammates first
+          const freeMates = teammates.filter(p => !p.marked);
+
+          if (freeMates.length > 0) {
+            const availableTargets = freeMates.filter(mate => {
+              // Check if any opponent is blocking the pass to this mate
+              return !opponents.some(op => {
+                const ax = this.x, ay = this.y;
+                const bx = mate.x, by = mate.y;
+                const px = op.x, py = op.y;
+
+                const abx = bx - ax;
+                const aby = by - ay;
+                const apx = px - ax;
+                const apy = py - ay;
+                const abLenSq = abx * abx + aby * aby;
+
+                const t = Math.max(0, Math.min(1, (apx * abx + apy * aby) / abLenSq));
+
+                const closestX = ax + abx * t;
+                const closestY = ay + aby * t;
+
+                const dist = Math.hypot(px - closestX, py - closestY);
+                const interceptionThreshold = 25;
+                const between = t > 0.05 && t < 0.95;
+
+                return dist < interceptionThreshold && between;
+              });
+            });
+
+            if (availableTargets.length > 0) {
+              // Pick one open teammate
+              const target = availableTargets[Math.floor(Math.random() * availableTargets.length)];
+
+              this.ballCooldown = 20;
+              this.hasBall = false;
+              passToCB({ x: target.x, y: target.y });
+              document.getElementById("log").addLog([this.team, this.name,"pass to",target.name].join(" "));
+            }
           }
         }
         break;
@@ -155,7 +200,8 @@ export class Player {
         if(this.hasBall){
           this.ballCooldown = 30;
           this.hasBall = false;
-          shootToCB({x: (this.currentFieldSide === "left" ? fieldWidth-10 : 10), y: fieldHeight / 2});
+          shootToCB(this.team);
+          document.getElementById("log").addLog([this.team, this.name,"shoot to goal"].join(" "));
         }
         break;
 
@@ -172,28 +218,31 @@ export class Player {
         }
         break;
 
-      case "Go forward":
-        this.target = {x: (this.currentFieldSide === "left" ? fieldWidth-10 : 10), y: this.y};
-        break;
-
       default:
         break;
     }
   }
 
   /** Evaluate a single condition string */
-  evaluateCondition(cond, simState) {
+  evaluateCondition(cond, action, simState) {
     const { ball, teammates, opponents, fieldWidth, fieldHeight } = simState;
+
+    if(["Pass the ball", "Shoot to goal"].includes(action) && !this.hasBall){
+      return false;
+    }
 
     switch (cond) {
       case "I has the ball":
         return this.hasBall;
 
+      case "I am near a rival":
+          return this.marked;
+
       case "The ball is near my goal":
         return (this.currentFieldSide === "left" && ball.x < fieldWidth * 0.3) ||
                (this.currentFieldSide === "right" && ball.x > fieldWidth * 0.7);
 
-      case "The ball is in my side":
+      case "The ball is in my side":       
         return (this.currentFieldSide === "left" && ball.x < fieldWidth * 0.51) ||
                (this.currentFieldSide === "right" && ball.x > fieldWidth * 0.49);
 
@@ -201,13 +250,18 @@ export class Player {
         return (this.currentFieldSide === "right" && ball.x < fieldWidth * 0.51) ||
                (this.currentFieldSide === "left" && ball.x > fieldWidth * 0.49);
 
-      case "The ball is near rival goal":
+      case "The ball is near rival goal":       
         return (this.currentFieldSide === "right" && ball.x < fieldWidth * 0.3) ||
                (this.currentFieldSide === "left" && ball.x > fieldWidth * 0.7);
-
-      case "I am near a rival":
-        return this.marked;
-
+         
+      case "Rival in my side":       
+        return (this.currentFieldSide === "left" && !opponents.every(p => p.x > fieldWidth * 0.49)) ||
+               (this.currentFieldSide === "right" && !opponents.every(p => p.x < fieldWidth * 0.51));
+         
+      case "No rival in my side":       
+        return (this.currentFieldSide === "left" && opponents.every(p => p.x > fieldWidth * 0.49)) ||
+               (this.currentFieldSide === "right" && opponents.every(p => p.x < fieldWidth * 0.51));
+         
       default:
         return false;
     }

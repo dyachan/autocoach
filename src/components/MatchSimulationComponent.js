@@ -2,6 +2,7 @@ import { Player } from "../models/Player.js";
 
 export class MatchSimulationComponent {
   PLAYER_SIZE = 38;
+  GOAL_SIZE = 120;
 
   constructor() {
     this.canvas = document.getElementById("gameCanvas");
@@ -52,6 +53,8 @@ export class MatchSimulationComponent {
   loadTeams(teamAData, teamBData) {
     this.teamA = teamAData;
     this.teamB = teamBData;
+    this.teamA.teamName = "Team A";
+    this.teamB.teamName = "Team B";
 
     this.players = [];
 
@@ -59,11 +62,6 @@ export class MatchSimulationComponent {
         {x: this.width*0.25, y: this.height*0.5},
         {x: this.width*0.4, y: this.height*0.3},
         {x: this.width*0.4, y: this.height*0.7}
-    ];
-    const basePositions = [
-        {x: this.width*0.1, y: this.height*0.5},
-        {x: this.width*0.65, y: this.height*0.2},
-        {x: this.width*0.65, y: this.height*0.8}
     ];
 
     // create players for Team A (left)
@@ -74,8 +72,8 @@ export class MatchSimulationComponent {
         rules: p.rules,
         x: initialPositions[i].x,
         y: initialPositions[i].y,
-        baseX: basePositions[i].x,
-        baseY: basePositions[i].y,
+        baseX: this.width*p.defaultZone.x/100,
+        baseY: this.height*p.defaultZone.y/100,
         defaultAction: "Keep in my zone",
         currentFieldSide: "left"
       });
@@ -90,8 +88,8 @@ export class MatchSimulationComponent {
         rules: p.rules,
         x: this.width - initialPositions[i].x,
         y: initialPositions[i].y,
-        baseX: this.width - basePositions[i].x,
-        baseY: basePositions[i].y,
+        baseX: this.width*p.defaultZone.x/100,
+        baseY: this.height*p.defaultZone.y/100,
         defaultAction: "Keep in my zone",
         currentFieldSide: "right"
       });
@@ -117,7 +115,7 @@ export class MatchSimulationComponent {
     this.gameLoopId = requestAnimationFrame(this.loop);
   };
 
-  update(dt=1) {
+  update(dt=0.5) {
     // basic ball motion
     this.ball.x += this.ball.vx;
     this.ball.y += this.ball.vy;
@@ -129,12 +127,22 @@ export class MatchSimulationComponent {
     this.ball.y = Math.max(10, Math.min(this.height - 10, this.ball.y));
     const balloffset = this.PLAYER_SIZE * 0.5 + 3;
     if(this.ball.x < balloffset || this.ball.x > this.width - balloffset){
+      if(this.ball.y > (this.height - this.GOAL_SIZE) / 2 && this.ball.y < (this.height + this.GOAL_SIZE) / 2){
+        // score goal
+        if(this.ball.x < balloffset){
+          document.getElementById("teambscore").textContent = parseInt(document.getElementById("teambscore").textContent) + 1;
+        } else {
+          document.getElementById("teamascore").textContent = parseInt(document.getElementById("teamascore").textContent) + 1;
+        }
+      }
+
       this.ball.x = this.width * 0.5;
       this.ball.y = this.height * 0.5;
       this.ball.vx = 0;
       this.ball.vy = 0;
       this.players.forEach( (p) => p.hasBall = false );
       this.emit("teamHasBall", {team: ""});
+      document.getElementById("log").addLog("reset ball");
     }
 
     // players logic
@@ -148,12 +156,21 @@ export class MatchSimulationComponent {
         ballTeam: this.players.find(p => p.hasBall)?.team
       };
 
-      player.checkMarked(simState.opponents);
+      player.checkMarked(simState.opponents, this.PLAYER_SIZE*2);
       const action = player.decide(simState);
       player.execute(
         simState,
-        ({x, y}) => {this.applyForceToBall({x, y}, 6)},
-        ({x, y}) => {this.applyForceToBall({x, y}, 10)}
+        ({x, y}) => {
+          const dx2 = x - this.ball.x;
+          const dy2 = y - this.ball.y;
+          const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+          console.log(3 + Math.min(dist2*0.01, 3))
+          this.applyForceToBall({x, y}, 2 + Math.min(dist2*0.01, 4));
+        },
+        (team) => {this.applyForceToBall({
+          x: team === "Team A" ? this.width : 0,
+          y: (this.height + this.GOAL_SIZE)/2 - Math.random()*this.GOAL_SIZE
+        }, 10)}
       );
       player.update(dt);
 
@@ -185,7 +202,7 @@ export class MatchSimulationComponent {
     // In the ball is disputed, the opponet player will has a Math.random() < 0.2 of chance to keep with the ball,
     // and a Math.random() < 0.5 to make the ball jump to a near zone.
 
-    const CONTROL_DISTANCE = this.PLAYER_SIZE * 0.5 + 1;
+    const CONTROL_DISTANCE = this.PLAYER_SIZE;
 
     // Find players near the ball
     const nearPlayers = this.players.filter(p => {
@@ -221,6 +238,7 @@ export class MatchSimulationComponent {
 
           this.emit("teamHasBall", {team: opponent.team});
           currentOwnerFeedback = opponent.team + " " + opponent.name;
+          document.getElementById("log").addLog([opponent.team, opponent.name,"steal ball to",currentOwner.name].join(" "));
           break;
 
         } else if (chance < 0.5) {
@@ -233,11 +251,14 @@ export class MatchSimulationComponent {
               y: this.ball.y + (Math.random() - 0.5) * 200
             }, 4);
           currentOwnerFeedback = "free";
+          
+          document.getElementById("log").addLog([opponent.team, opponent.name,"take off ball to",currentOwner.name].join(" "));
           break;
 
         } else {
           opponent.ballCooldown = 60;
           opponent.bodyCooldown = 60;
+          document.getElementById("log").addLog([opponent.team, opponent.name,"fails defending",currentOwner.name].join(" "));
         }
       }
 
@@ -247,28 +268,64 @@ export class MatchSimulationComponent {
       }
     } else {
       // No one currently has the ball
-      if (nearPlayers.length === 1) {
-        // Single player near the ball gains control
-        const newOwner = nearPlayers[0];
-        newOwner.hasBall = true;
-        this.ball.x = newOwner.x;
-        this.ball.y = newOwner.y;
-        this.ball.vx = 0;
-        this.ball.vy = 0;
-        this.emit("teamHasBall", {team: newOwner.team});
-        currentOwnerFeedback = newOwner.team + " " + newOwner.name;
-      } else if (nearPlayers.length > 1) {
-        // Contest between teams → ball bounces away
-        nearPlayers.forEach( (p) => p.ballCooldown = 20 );
-        this.applyForceToBall({
-          x: this.ball.x + (Math.random() - 0.5) * 200,
-          y: this.ball.y + (Math.random() - 0.5) * 200
-        }, 3);
+      if (nearPlayers.length > 0){
+        if (nearPlayers.every(p => p.team === nearPlayers[0].team)) {
+          // Same team players near, the ball gains control for any
+          const newOwner = nearPlayers[Math.floor(Math.random()*nearPlayers.length)];
+          
+          // Compute ball speed
+          const ballSpeed = Math.hypot(this.ball.vx, this.ball.vy);
+          const MAX_CONTROL_SPEED = 6.0; // tweak threshold
+  
+          if (ballSpeed > MAX_CONTROL_SPEED) {
+            // Too fast — ball bounces away randomly
+            const angle = Math.random() * Math.PI * 2;
+            const reboundStrength = ballSpeed * 0.3; // lose some speed
+            this.ball.vx = Math.cos(angle) * reboundStrength;
+            this.ball.vy = Math.sin(angle) * reboundStrength;
+  
+            newOwner.ballCooldown = 30;
+  
+            document
+              .getElementById("log")
+              .addLog([newOwner.team, newOwner.name, "failed to control fast ball"].join(" "));
+          } else {
+            // Successful control
+            newOwner.hasBall = true;
+            this.ball.x = newOwner.x;
+            this.ball.y = newOwner.y;
+            this.ball.vx = 0;
+            this.ball.vy = 0;
+            this.emit("teamHasBall", {team: newOwner.team});
+            currentOwnerFeedback = newOwner.team + " " + newOwner.name;
+            document.getElementById("log").addLog([newOwner.team, newOwner.name,"take ball"].join(" "));
+          }
+        } else {
+          // Contest between teams → ball bounces away
+          nearPlayers.forEach( (p) => p.ballCooldown = 20 );
+          this.applyForceToBall({
+            x: this.ball.x + (Math.random() - 0.5) * 200,
+            y: this.ball.y + (Math.random() - 0.5) * 200
+          }, 3);
+          document.getElementById("log").addLog("ball bounces away");
+        }
       }
     }
 
     // visual feedback
-    document.getElementById("ballteam").textContent = currentOwnerFeedback;
+    const finalOwner = this.players.find(p => p.hasBall);
+    if(finalOwner){
+      let msg = "";
+      if(finalOwner.team === "Team A"){
+        msg = "<span class='teamacolor'>";
+      } else {
+        msg = "<span class='teambcolor'>";
+      }
+      msg += finalOwner.team+"</span> "+finalOwner.name;
+      document.getElementById("ballteam").innerHTML = msg;
+    } else {
+      document.getElementById("ballteam").textContent = "free";
+    }
     for (const player of this.players) {
       this.emit("rule", {player: player, condition: player.currentCondition || "Default"});
     }
@@ -304,18 +361,24 @@ export class MatchSimulationComponent {
 
     // goals
     ctx.fillStyle = "#222";
-    ctx.fillRect(0, this.height / 2 - 30, 10, 60);
-    ctx.fillRect(this.width - 10, this.height / 2 - 30, 10, 60);
+    ctx.fillRect(0, (this.height - this.GOAL_SIZE) / 2, 10, this.GOAL_SIZE);
+    ctx.fillRect(this.width - 10, (this.height - this.GOAL_SIZE) / 2, 10, this.GOAL_SIZE);
 
     // players
     for (const p of this.players) {
       ctx.beginPath();
-      ctx.fillStyle = p.team === "Team A" ? "#65662d" : "#4f2d66";
+      ctx.fillStyle = p.team === "Team A" ? "#fd9946" : "#b676ff";
+      // keep zones
+      ctx.arc(p.baseX, p.baseY, this.PLAYER_SIZE*0.1, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
       if(p.bodyCooldown > 0 || p.ballCooldown > 0){
         ctx.arc( p.x, p.y, this.PLAYER_SIZE*0.5, 0, Math.max(0, Math.PI * 2 - Math.max(p.bodyCooldown, p.ballCooldown)*0.3) );
         ctx.fill();
         ctx.fillStyle += "55";
       }
+      ctx.beginPath();
       ctx.arc(p.x, p.y, this.PLAYER_SIZE*0.5, 0, Math.PI * 2);
       ctx.fill();
 
