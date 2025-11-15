@@ -25,6 +25,7 @@ import { MatchSimulationComponent } from "./components/MatchSimulationComponent.
 
 const conditions = [
     "I has the ball",
+    "I am marked",
     "I am near a rival",
     "The ball is near my goal",
     "The ball is in my side",
@@ -36,6 +37,7 @@ const conditions = [
 const actions = [
     "Keep in my zone",
     "Go to the ball",
+    "Go to near rival",
     "Go to my goal",
     "Go to rival goal",
     "Go forward",

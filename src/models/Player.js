@@ -9,6 +9,7 @@ export class Player {
     this.baseY = baseY;
     this.hasBall = false;
     this.marked = false;
+    this.opponentNear = false;
     this.defaultAction = defaultAction;
     this.currentFieldSide = currentFieldSide;
 
@@ -105,6 +106,10 @@ export class Player {
     this.marked = opponents.some(op => this.distanceTo(op) < markRadius);
     return this.marked;
   }
+  checkOpponentNear(opponents, markRadius) {
+    this.opponentNear = opponents.some(op => this.distanceTo(op) < markRadius);
+    return this.opponentNear;
+  }
 
   /** Decide what to do based on rules and world state */
   decide(simState) {
@@ -126,12 +131,30 @@ export class Player {
     const { ball, teammates, opponents, fieldWidth, fieldHeight } = simState;
 
     switch (this.currentAction) {
-      case "Keep in my zone":
-        this.target = { x: this.baseX, y: this.baseY };
-        break;
-
       case "Go to the ball":
         this.target = { x: ball.x, y: ball.y };
+        break;
+
+      case "Go to near rival":
+        if (opponents.length > 0) {
+          // Find closest opponent
+          let closest = null;
+          let closestDist = Infinity;
+
+          for (const opp of opponents) {
+            const dx = opp.x - this.x;
+            const dy = opp.y - this.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < closestDist) {
+              closestDist = d2;
+              closest = opp;
+            }
+          }
+
+          if (closest) {
+            this.target = { x: closest.x, y: closest.y };
+          }
+        }
         break;
 
       case "Go to my goal":
@@ -218,7 +241,8 @@ export class Player {
         }
         break;
 
-      default:
+      default: // case "Keep in my zone":
+        this.target = { x: this.baseX, y: this.baseY };
         break;
     }
   }
@@ -230,13 +254,19 @@ export class Player {
     if(["Pass the ball", "Shoot to goal"].includes(action) && !this.hasBall){
       return false;
     }
+    if(["Go to near rival"].includes(action) && !this.opponentNear){
+      return false;
+    }
 
     switch (cond) {
       case "I has the ball":
         return this.hasBall;
 
-      case "I am near a rival":
+      case "I am marked":
           return this.marked;
+
+      case "I am near a rival":
+          return this.opponentNear;
 
       case "The ball is near my goal":
         return (this.currentFieldSide === "left" && ball.x < fieldWidth * 0.3) ||

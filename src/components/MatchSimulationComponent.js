@@ -156,7 +156,8 @@ export class MatchSimulationComponent {
         ballTeam: this.players.find(p => p.hasBall)?.team
       };
 
-      player.checkMarked(simState.opponents, this.PLAYER_SIZE*2);
+      player.checkMarked(simState.opponents, this.PLAYER_SIZE*1.5);
+      player.checkOpponentNear(simState.opponents, this.PLAYER_SIZE*6);
       const action = player.decide(simState);
       player.execute(
         simState,
