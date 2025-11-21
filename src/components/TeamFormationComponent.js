@@ -23,9 +23,9 @@ export class TeamFormationComponent {
     });
   }
 
-  setCurrentRule(player, rule){
+  setCurrentRule(playerName, rule){
     this.players.forEach( (p) => {
-      if(p.playerName === player.name){
+      if(p.playerName === playerName){
         p.setCurrentRule(rule);
       }
     });

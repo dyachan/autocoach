@@ -1,27 +1,7 @@
-// import { PlayerInstructionComponent } from "./components/PlayerInstructionComponent.js";
 import { TeamFormationComponent } from "./components/TeamFormationComponent.js";
-import { MatchSimulationComponent } from "./components/MatchSimulationComponent.js";
-// import { FieldRendererComponent } from "./components/FieldRendererComponent.js";
-// import { GameStateManager } from "./components/GameStateManager.js";
-// import { UIController } from "./components/UIController.js";
+import { RenderComponent } from "./components/RenderComponent.js";
 
-// // Core setup
-// const stateManager = new GameStateManager();
-// const renderer = new FieldRendererComponent(document.getElementById("gameCanvas"), stateManager);
-// const match = new MatchSimulationComponent(stateManager, renderer);
-
-// const teamA = new TeamFormationComponent("Team A");
-// const teamB = new TeamFormationComponent("Team B");
-
-// const ui = new UIController(stateManager, match);
-
-// // Attach editors to sidebar
-// const editorPanel = document.getElementById("editorPanel");
-// editorPanel.appendChild(teamA.element);
-// editorPanel.appendChild(teamB.element);
-
-// match.setTeams(teamA, teamB);
-// renderer.start();
+const SPEED = 10;
 
 const conditions = [
     "I has the ball",
@@ -53,32 +33,99 @@ let teamB = new TeamFormationComponent("Team B", conditions, actions);
 document.getElementById("editorPanel").appendChild(teamB.root);
 teamB.root.style.display = "none";
 
-let match = new MatchSimulationComponent();
+let render = new RenderComponent();
+let currentSetTimeoutID = null;
+let currentMatch = null;
+let currentTick = 0;
+
+let renderTick = () => {
+  render.update(currentMatch[currentTick]);
+
+  // update player state
+  teamA.setCurrentRule("Goalkeeper", currentMatch[currentTick]["teamA"]["goalkeeper"]["condition"]);
+  teamA.setCurrentRule("Defender", currentMatch[currentTick]["teamA"]["defender"]["condition"]);
+  teamA.setCurrentRule("Striker", currentMatch[currentTick]["teamA"]["striker"]["condition"]);
+  teamB.setCurrentRule("Goalkeeper", currentMatch[currentTick]["teamB"]["goalkeeper"]["condition"]);
+  teamB.setCurrentRule("Defender", currentMatch[currentTick]["teamB"]["defender"]["condition"]);
+  teamB.setCurrentRule("Striker", currentMatch[currentTick]["teamB"]["striker"]["condition"]);
+
+  currentMatch[currentTick]["logs"].forEach( (log) => {
+    document.getElementById("log").addLog(log);
+
+    // check goals
+    if(log.includes("do a goal")){
+      if(log.includes("Team A")){
+        document.getElementById("teamascore").textContent = parseInt(document.getElementById("teamascore").textContent) + 1;
+      } else {
+        document.getElementById("teambscore").textContent = parseInt(document.getElementById("teambscore").textContent) + 1;
+      }
+      document.getElementById("ballteam").textContent = "free";
+      teamA.setMyTeamHasBall(false);
+      teamB.setMyTeamHasBall(false);
+    }
+
+    // check ball possition
+    if(log.includes(" take ball") || log.includes("steal ball to") || log.includes("take off ball to")){
+      document.getElementById("ballteam").innerHTML = log.split(" take ball")[0]
+                .split("steal ball to")[0]
+                .split("take off ball to")[0]
+                .replace("Team A", "<span class='teamacolor'>Team A</span>")
+                .replace("Team B", "<span class='teambcolor'>Team B</span>");
+      if(log.includes("Team A")){
+        teamA.setMyTeamHasBall(true);
+        teamB.setMyTeamHasBall(false);
+      } else {
+        teamB.setMyTeamHasBall(true);
+        teamA.setMyTeamHasBall(false);
+      }
+    } else if(log.includes("ball bounces away") || log.includes("reset ball") 
+              || log.includes("pass the ball") || log.includes("shoot to goal")){
+      document.getElementById("ballteam").textContent = "free";
+      teamA.setMyTeamHasBall(false);
+      teamB.setMyTeamHasBall(false);
+    }
+  });
+
+  currentTick++;
+  document.getElementById("matchpercent").textContent = Math.floor(100 * currentTick / currentMatch.length);
+  if(currentTick < currentMatch.length){
+    currentSetTimeoutID = setTimeout(renderTick, SPEED);
+  }
+}
+
+
+document.getElementById("pausebutton").addEventListener("click", ()=>{
+  if(currentSetTimeoutID){
+    clearTimeout(currentSetTimeoutID);
+    currentSetTimeoutID = null;
+  } else {
+    renderTick();
+  }
+});
+
+
 document.getElementById("btn-init-match").addEventListener("click", () => {
-  match.loadTeams(teamA.getTeamData(), teamB.getTeamData());
-  match.start();
-  document.getElementById("log").addLog("-----------------------");
-});
-
-match.on("teamHasBall", ({ team }) => {
-  if(team === "Team A"){
-    teamA.setMyTeamHasBall(true);
-    teamB.setMyTeamHasBall(false);
-  } else if(team === "Team B"){
-    teamB.setMyTeamHasBall(true);
-    teamA.setMyTeamHasBall(false);
-  } else {
-    teamA.setMyTeamHasBall(false);
-    teamB.setMyTeamHasBall(false);
+  if(currentSetTimeoutID){
+    clearTimeout(currentSetTimeoutID);
+    currentSetTimeoutID = null;
   }
-});
 
-match.on("rule", ({ player, condition }) => {
-  if(player.team === "Team A"){
-    teamA.setCurrentRule(player, condition)
-  } else {
-    teamB.setCurrentRule(player, condition)
-  }
+  fetch("https://laraveltest-frosty-log-30.fly.dev/api/play", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ teamA: teamA.getTeamData(), teamB: teamB.getTeamData() })
+  }).then( (response) => {
+    return response.json();
+  }).then( (data) => {
+    currentMatch = data["match"];
+    teamA.setMyTeamHasBall(false);
+    teamB.setMyTeamHasBall(false);
+    document.getElementById("teamascore").textContent = 0;
+    document.getElementById("teambscore").textContent = 0;
+    document.getElementById("log").innerHTML = "";
+    currentTick = 0;
+    renderTick();
+  });
 });
 
 // log system
