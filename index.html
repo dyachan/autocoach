@@ -20,8 +20,8 @@
       <canvas id="gameCanvas"></canvas>
       <article>
         <span id="teamascore">0</span>
-        <span class="teamacolor"> Team A </span>
-        <span class="teambcolor"> Team B </span>
+        <span id="teamalabel" class="teamacolor"> Team A </span>
+        <span id="teamblabel" class="teambcolor"> Team B </span>
         <span id="teambscore">0</span>
       </article>
     </section>
@@ -48,6 +48,7 @@
         } else {
           tf.style.display = "none";
         }
+        document.updatePlayersDefaultPosition();
       });
     }
   </script>
@@ -56,12 +57,19 @@
   <template id="tpl-team-formation">
     <div class="team-formation">
       <div class="team-controls">
-        <button class="btn-change-team" onclick="toggleTeam()">Other team</button>
         <label>
-          <h2>Nombre</h2>
+          <h2>Name</h2>
           <input class="team-name"></input>
+          <span class="team-message"></span>
+          <button class="btn-upload-team">Upload Team</button>
         </label>
         <label>
+          <select class="team-selection"></select>
+          <button class="btn-select-team">Select Team</button>
+          <div style="flex-grow: 2;"></div>
+          <button class="btn-change-team" onclick="toggleTeam()">Other team</button>
+        </label>
+        <label style="justify-content: space-between">
           <button class="btn-export-team">Export Team</button>
           <input class="import-area"></input>
           <button class="btn-import-team">Import Team</button>

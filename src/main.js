@@ -28,29 +28,46 @@ const actions = [
     "Change side"
 ]
 
+// create formations
 let teamA = new TeamFormationComponent("Team A", conditions, actions);
 document.getElementById("editorPanel").appendChild(teamA.root);
 let teamB = new TeamFormationComponent("Team B", conditions, actions);
 document.getElementById("editorPanel").appendChild(teamB.root);
 teamB.root.style.display = "none";
 
+// render
 let render = new RenderComponent();
 let currentSetTimeoutID = null;
 let currentMatch = null;
 let currentTick = 0;
 
 document.updatePlayersDefaultPosition = () => {
-  let teamdata = teamA.getTeamData();
-  render.renderField();
-  render.renderPlayer(render.width * teamdata["players"][0]["defaultZone"]["x"] / 100,
-                      render.height - render.height * teamdata["players"][0]["defaultZone"]["y"] / 100,
-                      "#fd9946", 0, false, "Goalkeeper");
-  render.renderPlayer(render.width * teamdata["players"][1]["defaultZone"]["x"] / 100,
-                      render.height - render.height * teamdata["players"][1]["defaultZone"]["y"] / 100,
-                      "#fd9946", 0, false, "Defender");
-  render.renderPlayer(render.width * teamdata["players"][2]["defaultZone"]["x"] / 100,
-                      render.height - render.height * teamdata["players"][2]["defaultZone"]["y"] / 100,
-                      "#fd9946", 0, false, "Striker");
+  if(document.querySelector(".team-formation").style.display === "none"){
+    // first team is Team A, and is not showing, so we are showing team b
+    let teamdata = teamB.getTeamData();
+    render.renderField();
+    render.renderPlayer(render.width * (100 - teamdata["players"][0]["defaultZone"]["x"]) / 100,
+                        render.height - render.height * (100 - teamdata["players"][0]["defaultZone"]["y"]) / 100,
+                        "#b676ff", 0, false, "Goalkeeper");
+    render.renderPlayer(render.width * (100 - teamdata["players"][1]["defaultZone"]["x"]) / 100,
+                        render.height - render.height * (100 - teamdata["players"][1]["defaultZone"]["y"]) / 100,
+                        "#b676ff", 0, false, "Defender");
+    render.renderPlayer(render.width * (100 - teamdata["players"][2]["defaultZone"]["x"]) / 100,
+                        render.height - render.height * (100 - teamdata["players"][2]["defaultZone"]["y"]) / 100,
+                        "#b676ff", 0, false, "Striker");
+  } else {
+    let teamdata = teamA.getTeamData();
+    render.renderField();
+    render.renderPlayer(render.width * teamdata["players"][0]["defaultZone"]["x"] / 100,
+                        render.height - render.height * teamdata["players"][0]["defaultZone"]["y"] / 100,
+                        "#fd9946", 0, false, "Goalkeeper");
+    render.renderPlayer(render.width * teamdata["players"][1]["defaultZone"]["x"] / 100,
+                        render.height - render.height * teamdata["players"][1]["defaultZone"]["y"] / 100,
+                        "#fd9946", 0, false, "Defender");
+    render.renderPlayer(render.width * teamdata["players"][2]["defaultZone"]["x"] / 100,
+                        render.height - render.height * teamdata["players"][2]["defaultZone"]["y"] / 100,
+                        "#fd9946", 0, false, "Striker");
+  }
 }
 document.updatePlayersDefaultPosition();
 
@@ -85,8 +102,8 @@ let renderTick = () => {
       document.getElementById("ballteam").innerHTML = log.split(" take ball")[0]
                 .split("steal ball to")[0]
                 .split("take off ball to")[0]
-                .replace("Team A", "<span class='teamacolor'>Team A</span>")
-                .replace("Team B", "<span class='teambcolor'>Team B</span>");
+                .replace("Team A", "<span class='teamacolor'>"+teamA.getTeamName()+"</span>")
+                .replace("Team B", "<span class='teambcolor'>"+teamB.getTeamName()+"</span>");
       if(log.includes("Team A")){
         teamA.setMyTeamHasBall(true);
         teamB.setMyTeamHasBall(false);
@@ -109,6 +126,7 @@ let renderTick = () => {
   }
 }
 
+// play / pause
 document.getElementById("pausebutton").addEventListener("click", ()=>{
   if(currentSetTimeoutID){
     clearTimeout(currentSetTimeoutID);
@@ -118,8 +136,12 @@ document.getElementById("pausebutton").addEventListener("click", ()=>{
   }
 });
 
+// load match
+const loadBtn = document.getElementById("btn-init-match");
+loadBtn.addEventListener("click", () => {
+  loadBtn.disabled = true;
 
-document.getElementById("btn-init-match").addEventListener("click", () => {
+  // stop prev match
   if(currentSetTimeoutID){
     clearTimeout(currentSetTimeoutID);
     currentSetTimeoutID = null;
@@ -132,11 +154,14 @@ document.getElementById("btn-init-match").addEventListener("click", () => {
   }).then( (response) => {
     return response.json();
   }).then( (data) => {
+    loadBtn.disabled = false;
     currentMatch = data["match"];
     teamA.setMyTeamHasBall(false);
     teamB.setMyTeamHasBall(false);
     document.getElementById("teamascore").textContent = 0;
     document.getElementById("teambscore").textContent = 0;
+    document.getElementById("teamalabel").textContent = teamA.getTeamName();
+    document.getElementById("teamblabel").textContent = teamB.getTeamName();
     document.getElementById("log").innerHTML = "";
     currentTick = 0;
     renderTick();
@@ -145,6 +170,15 @@ document.getElementById("btn-init-match").addEventListener("click", () => {
 
 // log system
 document.getElementById("log").addLog = function(log){
-  log = log.replace("Team A", "<span class='teamacolor'>Team A</span>").replace("Team B", "<span class='teambcolor'>Team B</span>");
+  log = log.replace("Team A", "<span class='teamacolor'>"+teamA.getTeamName()+"</span>")
+           .replace("Team B", "<span class='teambcolor'>"+teamB.getTeamName()+"</span>");
   document.getElementById("log").innerHTML = log + "<br>" + document.getElementById("log").innerHTML;
 };
+
+fetch(CONSTANTS.server_url+"getteams")
+.then( (response) => {
+  return response.json();
+}).then( ({data}) => {
+  teamA.setFormations(data);
+  teamB.setFormations(data);
+});

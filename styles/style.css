@@ -106,6 +106,30 @@ button:hover {
   opacity: 1;
 }
 
+select {
+  background: var(--background-color);
+  color: var(--font-color);
+  border: 1px solid var(--background-panel-color);
+  border-radius: var(--gap-small);
+  padding: var(--gap-small);
+}
+
+.import-area {
+  flex-grow: 2;
+}
+
+.team-selection {
+  max-width: 350px;
+}
+
+.team-message {
+  flex: 2 1 0;            /* grow sí, pero con base 0 y permitido encoger */
+  min-width: 0;           /* clave para que pueda romper línea dentro de flex */
+  white-space: normal;    /* permite saltos de línea */
+  overflow-wrap: break-word; /* si hay palabras largas, que se partan */
+  color: var(--warning-color);
+  font-size: 0.7em;
+}
 
 /* Player Instruction Component */
 .player-instructions {
@@ -159,14 +183,6 @@ button:hover {
 .player-instructions .defaultaction .active  {
   background: var(--background-color);
   color: var(--active-background-color);
-}
-
-.rule-item select {
-  background: var(--background-color);
-  color: var(--font-color);
-  border: 1px solid var(--background-panel-color);
-  border-radius: var(--gap-small);
-  padding: var(--gap-small);
 }
 
 .btn-add-rule{

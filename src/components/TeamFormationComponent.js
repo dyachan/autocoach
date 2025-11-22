@@ -7,9 +7,12 @@ export class TeamFormationComponent {
     this.conditions = conditions;
     this.actions = actions;
     this.onUpdate = onUpdate;
+    this.formations = []
 
     this.players = [];
     this.root = null;
+    this.currentUploadClick = 0;
+    this.currentUploadTimeout = null;
 
     // roles will be created in order (index -> role mapping)
     this.roles = ["Goalkeeper", "Defender", "Striker"];
@@ -86,14 +89,24 @@ export class TeamFormationComponent {
     btnExport.addEventListener("click", () => this.exportTeam());
     btnImport.addEventListener("click", () => this.importTeam());
 
+    const btnSelectTeam = container.querySelector(".btn-select-team");
+    btnSelectTeam.addEventListener("click", () => this.selectTeam());
+
+    const btnUploadTeam = container.querySelector(".btn-upload-team");
+    btnUploadTeam.addEventListener("click", () => this.uploadTeam());
+
     if(this.teamName === "Team A"){
       titleEl.classList.add("teamacolor");
       btnExport.classList.add("teamabgcolor");
       btnImport.classList.add("teamabgcolor");
+      btnSelectTeam.classList.add("teamabgcolor");
+      container.querySelector(".btn-change-team").classList.add("teambbgcolor");
     } else {
       titleEl.classList.add("teambcolor");
       btnExport.classList.add("teambbgcolor");
       btnImport.classList.add("teambbgcolor");
+      btnSelectTeam.classList.add("teambbgcolor");
+      container.querySelector(".btn-change-team").classList.add("teamabgcolor");
     }
     
     this.root = container;
@@ -103,6 +116,10 @@ export class TeamFormationComponent {
       this.importTeam();
     }
     return container;
+  }
+
+  getTeamName() {
+    return this.root.querySelector(".team-name").value;
   }
 
   getTeamData() {
@@ -132,13 +149,6 @@ export class TeamFormationComponent {
     const data = JSON.stringify(this.getTeamData());
     this.root.querySelector(".import-area").value = data;
 
-    // fetch(CONSTANTS.server_url+"storeteam", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ name: "testname", formation: data })
-    // });
-
-
     // manza pilleria
     // const blob = new Blob([data], { type: "application/json" });
     // const url = URL.createObjectURL(blob);
@@ -156,9 +166,73 @@ export class TeamFormationComponent {
     localStorage.setItem(this.teamName, this.root.querySelector(".import-area").value);
   }
 
+  selectTeam() {
+    const name = this.root.querySelector(".team-selection").value;
+    for(let formation of this.formations){
+      if(formation.name == name){
+        this.loadTeamData(JSON.parse(formation.formation));
+        this.root.querySelector(".team-name").value = formation.name;
+        break;
+      }
+    }
+  }
+
+  uploadTeam() {
+    const messages = [
+      "Upload this team?",
+      "database is limited ...",
+      "sure? sure? sure?",
+    ];
+    
+    if(this.currentUploadClick < messages.length){ // before upload
+      this.root.querySelector(".team-message").textContent = messages[this.currentUploadClick];
+      this.currentUploadClick++
+      if(this.currentUploadTimeout){
+        clearTimeout(this.currentUploadTimeout);
+        this.currentUploadTimeout = null;
+      }
+      this.currentUploadTimeout = setTimeout(() => {
+        this.currentUploadClick = 0;
+        this.root.querySelector(".team-message").textContent = "";
+      }, 5000);
+    } else { // upload
+      clearTimeout(this.currentUploadTimeout);
+      this.currentUploadTimeout = null;
+      this.currentUploadClick = 0;
+      this.root.querySelector(".team-message").textContent = "Uploading";
+      this.root.querySelector(".btn-upload-team").disabled = true;
+      fetch(CONSTANTS.server_url+"storeteam", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: this.getTeamName(), formation: JSON.stringify(this.getTeamData()) })
+      }).then( (response) => {
+        return response.json();
+      }).then( (response) => {
+        if(response.success){
+          this.root.querySelector(".team-message").textContent = "Uploaded :)";
+        } else {
+          this.root.querySelector(".team-message").textContent = response.error + " :(";
+        }
+        this.root.querySelector(".btn-upload-team").disabled = false;
+      }).catch( (error) => {
+        console.log(error);
+      });
+    }
+  }
+
   triggerUpdate() {
     if (typeof this.onUpdate === "function") {
       this.onUpdate(this.getTeamData());
     }
+  }
+
+  setFormations(formations) {
+    this.formations = formations;
+    const selectDom = this.root.querySelector(".team-selection");
+    formations.forEach( (formation) => {
+      const opt = document.createElement("option");
+      opt.textContent = formation.name;
+      selectDom.appendChild(opt);
+    });
   }
 }
