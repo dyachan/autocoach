@@ -81,6 +81,12 @@ export class PlayerInstructionComponent {
 
     this.root = container;
     this.setDefaultZoneValues();
+    this.root.querySelector(".defaultzonex").addEventListener("change", () => {
+      document.updatePlayersDefaultPosition();
+    })
+    this.root.querySelector(".defaultzoney").addEventListener("change", () => {
+      document.updatePlayersDefaultPosition();
+    })
     return container;
   }
 

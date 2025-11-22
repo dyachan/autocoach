@@ -30,87 +30,90 @@ export class RenderComponent {
     this.emit("teamHasBall", {team: ""});
   }
 
-  renderPlayer(ctx, x, y, color, cooldown, marked, name){
-    ctx.beginPath();
-    ctx.fillStyle = color;
+  renderPlayer(x, y, color, cooldown, marked, name){
+    this.ctx.beginPath();
+    this.ctx.fillStyle = color;
 
-    ctx.beginPath();
+    this.ctx.beginPath();
     if(cooldown > 0){
-      ctx.arc( x, y, this.PLAYER_SIZE*0.5, 0, Math.max(0, Math.PI * 2 - cooldown*0.3) );
-      ctx.fill();
-      ctx.fillStyle += "55";
+      this.ctx.arc( x, y, this.PLAYER_SIZE*0.5, 0, Math.max(0, Math.PI * 2 - cooldown*0.3) );
+      this.ctx.fill();
+      this.ctx.fillStyle += "55";
     }
-    ctx.beginPath();
-    ctx.arc(x, y, this.PLAYER_SIZE*0.5, 0, Math.PI * 2);
-    ctx.fill();
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, this.PLAYER_SIZE*0.5, 0, Math.PI * 2);
+    this.ctx.fill();
 
     if(marked){
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = "#5d0b0b55";
-      ctx.stroke();
+      this.ctx.lineWidth = 3;
+      this.ctx.strokeStyle = "#5d0b0b55";
+      this.ctx.stroke();
     }
-    ctx.fillStyle = "#fff";
-    ctx.font = "10px sans-serif";
-    ctx.fillText(name[0], x - 3, y + 3);
+    this.ctx.fillStyle = "#fff";
+    this.ctx.font = "10px sans-serif";
+    this.ctx.fillText(name[0], x - 3, y + 3);
+  }
+
+  renderField(){
+    this.ctx.clearRect(0, 0, this.width, this.height);
+
+    // field
+    this.ctx.fillStyle = "#0b5d0b";
+    this.ctx.fillRect(0, 0, this.width, this.height);
+
+    // center line
+    this.ctx.strokeStyle = "#ffffff44";
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, this.height / 2);
+    this.ctx.lineTo(this.width, this.height / 2);
+    this.ctx.stroke();
+
+    // goals
+    this.ctx.fillStyle = "#222";
+    this.ctx.fillRect((this.width - this.GOAL_SIZE) / 2, 0, this.GOAL_SIZE, 10);
+    this.ctx.fillRect((this.width - this.GOAL_SIZE) / 2, this.height - 10, this.GOAL_SIZE, 10);
   }
 
   update(instant) {
-    const ctx = this.ctx;
-    ctx.clearRect(0, 0, this.width, this.height);
-
-    // field
-    ctx.fillStyle = "#0b5d0b";
-    ctx.fillRect(0, 0, this.width, this.height);
-
-    // center line
-    ctx.strokeStyle = "#ffffff44";
-    ctx.beginPath();
-    ctx.moveTo(this.width / 2, 0);
-    ctx.lineTo(this.width / 2, this.height);
-    ctx.stroke();
-
-    // goals
-    ctx.fillStyle = "#222";
-    ctx.fillRect(0, (this.height - this.GOAL_SIZE) / 2, 10, this.GOAL_SIZE);
-    ctx.fillRect(this.width - 10, (this.height - this.GOAL_SIZE) / 2, 10, this.GOAL_SIZE);
+    this.renderField();
 
     // players
-    this.renderPlayer(ctx, 
-      instant["teamA"]["goalkeeper"]["x"], instant["teamA"]["goalkeeper"]["y"], 
+    this.renderPlayer( 
+      instant["teamA"]["goalkeeper"]["x"], this.height-instant["teamA"]["goalkeeper"]["y"], 
       "#fd9946",
       Math.max(instant["teamA"]["goalkeeper"]["ballCooldown"], instant["teamA"]["goalkeeper"]["bodyCooldown"]),
       instant["teamA"]["goalkeeper"]["marked"], "Goalkeeper");
-    this.renderPlayer(ctx, 
-      instant["teamA"]["defender"]["x"], instant["teamA"]["defender"]["y"], 
+    this.renderPlayer( 
+      instant["teamA"]["defender"]["x"], this.height-instant["teamA"]["defender"]["y"], 
       "#fd9946",
       Math.max(instant["teamA"]["defender"]["ballCooldown"], instant["teamA"]["defender"]["bodyCooldown"]),
       instant["teamA"]["defender"]["marked"], "Defender");
-    this.renderPlayer(ctx, 
-      instant["teamA"]["striker"]["x"], instant["teamA"]["striker"]["y"], 
+    this.renderPlayer( 
+      instant["teamA"]["striker"]["x"], this.height-instant["teamA"]["striker"]["y"], 
       "#fd9946",
       Math.max(instant["teamA"]["striker"]["ballCooldown"], instant["teamA"]["striker"]["bodyCooldown"]),
       instant["teamA"]["striker"]["marked"], "Striker");
 
-    this.renderPlayer(ctx, 
-      instant["teamB"]["goalkeeper"]["x"], instant["teamB"]["goalkeeper"]["y"], 
+    this.renderPlayer( 
+      instant["teamB"]["goalkeeper"]["x"], this.height-instant["teamB"]["goalkeeper"]["y"], 
       "#b676ff",
       Math.max(instant["teamB"]["goalkeeper"]["ballCooldown"], instant["teamB"]["goalkeeper"]["bodyCooldown"]),
       instant["teamB"]["goalkeeper"]["marked"], "Goalkeeper");
-    this.renderPlayer(ctx, 
-      instant["teamB"]["defender"]["x"], instant["teamB"]["defender"]["y"], 
+    this.renderPlayer( 
+      instant["teamB"]["defender"]["x"], this.height-instant["teamB"]["defender"]["y"], 
       "#b676ff",
       Math.max(instant["teamB"]["defender"]["ballCooldown"], instant["teamB"]["defender"]["bodyCooldown"]),
       instant["teamB"]["defender"]["marked"], "Defender");
-    this.renderPlayer(ctx, 
-      instant["teamB"]["striker"]["x"], instant["teamB"]["striker"]["y"], 
+    this.renderPlayer( 
+      instant["teamB"]["striker"]["x"], this.height-instant["teamB"]["striker"]["y"], 
       "#b676ff",
       Math.max(instant["teamB"]["striker"]["ballCooldown"], instant["teamB"]["striker"]["bodyCooldown"]),
       instant["teamB"]["striker"]["marked"], "Striker");
 
     // ball
-    ctx.beginPath();
-    ctx.fillStyle = "#fff";
-    ctx.arc(instant["ball"]["x"], instant["ball"]["y"], this.PLAYER_SIZE*0.2, 0, Math.PI * 2);
-    ctx.fill();
+    this.ctx.beginPath();
+    this.ctx.fillStyle = "#fff";
+    this.ctx.arc(instant["ball"]["x"], this.height-instant["ball"]["y"], this.PLAYER_SIZE*0.2, 0, Math.PI * 2);
+    this.ctx.fill();
   }
 }

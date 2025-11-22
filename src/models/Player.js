@@ -241,7 +241,7 @@ export class Player {
         }
         break;
 
-      default: // case "Keep in my zone":
+      default: // case "Stay in my zone":
         this.target = { x: this.baseX, y: this.baseY };
         break;
     }

@@ -1,4 +1,5 @@
 import { PlayerInstructionComponent } from "./PlayerInstructionComponent.js";
+import { CONSTANTS } from "../Constants.js";
 
 export class TeamFormationComponent {
   constructor(teamName, conditions, actions, onUpdate) {
@@ -42,7 +43,7 @@ export class TeamFormationComponent {
 
     // set team name
     const titleEl = container.querySelector(".team-name");
-    if (titleEl) titleEl.textContent = this.teamName;
+    if (titleEl) titleEl.value = this.teamName;
 
     // players wrapper where PlayerInstructionComponents will be mounted
     const playersWrapper = container.querySelector(".players-wrapper");
@@ -106,7 +107,6 @@ export class TeamFormationComponent {
 
   getTeamData() {
     const team = {
-      // teamName: this.teamName,
       players: this.players.map((p) => ({
         name: p.playerName,
         rules: p.getRules(),
@@ -131,6 +131,13 @@ export class TeamFormationComponent {
   exportTeam() {
     const data = JSON.stringify(this.getTeamData());
     this.root.querySelector(".import-area").value = data;
+
+    // fetch(CONSTANTS.server_url+"storeteam", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ name: "testname", formation: data })
+    // });
+
 
     // manza pilleria
     // const blob = new Blob([data], { type: "application/json" });

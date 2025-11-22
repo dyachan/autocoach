@@ -36,17 +36,21 @@ body {
 
 header {
   background: var(--background-panel-color);
-  padding: var(--gap);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  position: fixed;
+  right: 0px;
+  z-index: 1;
+  max-height: 100%;
+  gap: var(--gap);
 }
 
 main {
   flex: 1;
   display: flex;
   flex-direction: row;
-  overflow: hidden;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  overflow-y: auto;
   position: relative;
   background: var(--background-color);
   gap: var(--gap);
@@ -57,20 +61,19 @@ hr {
 }
 
 h2 {
+  color: var(--reserverd-color);
   margin: 0%;
 }
 
-#editorPanel {
-  background: var(--background-panel-color);
-  padding: var(--gap);
-  overflow-y: auto;
+label{
   display: flex;
+  flex-direction: row;
   gap: var(--gap);
 }
 
 canvas {
-  width: 800px;
-  height: 400px;
+  height: 600px;
+  width: 400px;
 }
 
 .reservedword.reservedword.reservedword{
@@ -190,12 +193,14 @@ button:hover {
 
 .players-wrapper {
   display: flex;
+  flex-direction: column;
   gap: var(--gap);
+  overflow-y: auto;
 }
 
 .team-controls {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: var(--gap);
 }
 

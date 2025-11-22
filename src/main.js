@@ -1,5 +1,6 @@
 import { TeamFormationComponent } from "./components/TeamFormationComponent.js";
 import { RenderComponent } from "./components/RenderComponent.js";
+import { CONSTANTS } from "./Constants.js";
 
 const SPEED = 10;
 
@@ -15,7 +16,7 @@ const conditions = [
     "No rival in my side"
 ];
 const actions = [
-    "Keep in my zone",
+    "Stay in my zone",
     "Go to the ball",
     "Go to near rival",
     "Go to my goal",
@@ -37,6 +38,21 @@ let render = new RenderComponent();
 let currentSetTimeoutID = null;
 let currentMatch = null;
 let currentTick = 0;
+
+document.updatePlayersDefaultPosition = () => {
+  let teamdata = teamA.getTeamData();
+  render.renderField();
+  render.renderPlayer(render.width * teamdata["players"][0]["defaultZone"]["x"] / 100,
+                      render.height - render.height * teamdata["players"][0]["defaultZone"]["y"] / 100,
+                      "#fd9946", 0, false, "Goalkeeper");
+  render.renderPlayer(render.width * teamdata["players"][1]["defaultZone"]["x"] / 100,
+                      render.height - render.height * teamdata["players"][1]["defaultZone"]["y"] / 100,
+                      "#fd9946", 0, false, "Defender");
+  render.renderPlayer(render.width * teamdata["players"][2]["defaultZone"]["x"] / 100,
+                      render.height - render.height * teamdata["players"][2]["defaultZone"]["y"] / 100,
+                      "#fd9946", 0, false, "Striker");
+}
+document.updatePlayersDefaultPosition();
 
 let renderTick = () => {
   render.update(currentMatch[currentTick]);
@@ -93,7 +109,6 @@ let renderTick = () => {
   }
 }
 
-
 document.getElementById("pausebutton").addEventListener("click", ()=>{
   if(currentSetTimeoutID){
     clearTimeout(currentSetTimeoutID);
@@ -110,7 +125,7 @@ document.getElementById("btn-init-match").addEventListener("click", () => {
     currentSetTimeoutID = null;
   }
 
-  fetch("https://laraveltest-frosty-log-30.fly.dev/api/play", {
+  fetch(CONSTANTS.server_url+"play", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ teamA: teamA.getTeamData(), teamB: teamB.getTeamData() })

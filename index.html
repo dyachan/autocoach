@@ -7,12 +7,16 @@
   <link rel="stylesheet" href="./styles/style.css" />
 </head>
 <body>
-  <header>
-    <div id="editorPanel"></div>
+  <header id="editorPanel">
   </header>
   
   <main>
     <section class="matchpanel">
+      <article class="matchcontrols">
+        <button id="btn-init-match">Load</button>
+        <span id="matchpercent">0</span><span>%</span>
+        <button id="pausebutton">play / pause</button>
+      </article>
       <canvas id="gameCanvas"></canvas>
       <article>
         <span id="teamascore">0</span>
@@ -21,12 +25,8 @@
         <span id="teambscore">0</span>
       </article>
     </section>
+
     <section class="matchpanel">
-      <article class="matchcontrols">
-        <button id="btn-init-match">Cargar</button>
-        <span id="matchpercent">0</span><span>%</span>
-        <button id="pausebutton">> / ||</button>
-      </article>
       <article class="matchinfo">
         <span>Ball: </span><span id="ballteam"></span>
         <fieldset id="log">
@@ -57,10 +57,15 @@
     <div class="team-formation">
       <div class="team-controls">
         <button class="btn-change-team" onclick="toggleTeam()">Other team</button>
-        <h2 class="team-name">Team</h2>
-        <button class="btn-export-team">Export Team JSON</button>
-        <input class="import-area"></input>
-        <button class="btn-import-team">Import Team JSON</button>
+        <label>
+          <h2>Nombre</h2>
+          <input class="team-name"></input>
+        </label>
+        <label>
+          <button class="btn-export-team">Export Team</button>
+          <input class="import-area"></input>
+          <button class="btn-import-team">Import Team</button>
+        </label>
       </div>
       <div class="players-wrapper"></div>
     </div>

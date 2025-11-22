@@ -74,7 +74,7 @@ export class MatchSimulationComponent {
         y: initialPositions[i].y,
         baseX: this.width*p.defaultZone.x/100,
         baseY: this.height*p.defaultZone.y/100,
-        defaultAction: "Keep in my zone",
+        defaultAction: "Stay in my zone",
         currentFieldSide: "left"
       });
       this.players.push(player);
@@ -90,7 +90,7 @@ export class MatchSimulationComponent {
         y: initialPositions[i].y,
         baseX: this.width*p.defaultZone.x/100,
         baseY: this.height*p.defaultZone.y/100,
-        defaultAction: "Keep in my zone",
+        defaultAction: "Stay in my zone",
         currentFieldSide: "right"
       });
       this.players.push(player);
