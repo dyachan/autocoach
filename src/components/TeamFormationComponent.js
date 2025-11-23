@@ -52,17 +52,10 @@ export class TeamFormationComponent {
     const playersWrapper = container.querySelector(".players-wrapper");
 
     let basePositions = [
-      {x: 10, y: 50},
-      {x: 65, y: 20},
+      {x: 50, y: 20},
+      {x: 35, y: 50},
       {x: 65, y: 80}
     ];
-    if(this.teamName === "Team B"){
-      basePositions = [
-        {x: 90, y: 50},
-        {x: 35, y: 20},
-        {x: 35, y: 80}
-      ];
-    }
 
     // create the 3 player instruction components and mount their UI
     this.roles.forEach((role, idx) => {
