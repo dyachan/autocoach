@@ -8,6 +8,7 @@
   --warning-background-color: #662d2d;
   --active-background-color: #662d2d55;
   --reserverd-color: #4faa52;
+  --disabled-color: #797979;
 
   --team-A-color: #fd9946;
   --team-A-background-color: #70431e;
@@ -60,7 +61,7 @@ hr {
   color: var(--background-color);
 }
 
-h2 {
+p {
   color: var(--reserverd-color);
   margin: 0%;
 }
@@ -112,6 +113,18 @@ select {
   border: 1px solid var(--background-panel-color);
   border-radius: var(--gap-small);
   padding: var(--gap-small);
+}
+
+.matchcontrols button{
+  min-width: 50px;
+  min-height: 30px;
+}
+.matchcontrols #matchpercent{
+  display: inline-block;
+  min-width: 30px;
+}
+.matchinfo label{
+  min-height: 30px;
 }
 
 .import-area {
@@ -219,6 +232,9 @@ select {
   flex-direction: column;
   gap: var(--gap);
 }
+.team-controls button{
+  min-width: 90px;
+}
 
 .matchpanel{
   display: flex;
@@ -229,20 +245,20 @@ select {
 
 .matchpanel fieldset{
   width: 400px;
-  height: 400px;
+  height: 590px;
   overflow-y: scroll;
 }
 
-.teamacolor.teamacolor.teamacolor{
+.teamacolor{
   color: var(--team-A-color);
 }
-.teambcolor.teambcolor.teambcolor{
+.teambcolor{
   color: var(--team-B-color);
 }
-.teamabgcolor.teamabgcolor.teamabgcolor{
+.teamabgcolor{
   background: var(--team-A-background-color);
 }
-.teambbgcolor.teambbgcolor.teambbgcolor{
+.teambbgcolor{
   background: var(--team-B-background-color);
 }
 
@@ -253,3 +269,10 @@ input {
   border-radius: var(--gap-small);
   padding: var(--gap-small);
 }
+
+button:disabled {
+  background-color: var(--disabled-color);
+  opacity: 0.8;
+  cursor: default;
+}
+

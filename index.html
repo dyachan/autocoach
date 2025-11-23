@@ -15,7 +15,8 @@
       <article class="matchcontrols">
         <button id="btn-init-match">Load</button>
         <span id="matchpercent">0</span><span>%</span>
-        <button id="pausebutton">play / pause</button>
+        <button id="restartbutton" disabled>Restart</button>
+        <button id="pausebutton" disabled>Pause</button>
       </article>
       <canvas id="gameCanvas"></canvas>
       <article>
@@ -28,7 +29,9 @@
 
     <section class="matchpanel">
       <article class="matchinfo">
-        <span>Ball: </span><span id="ballteam"></span>
+        <label>
+          <span>Ball: </span><span id="ballteam"></span>
+        </label>
         <fieldset id="log">
           <legend>Log:</legend>
         </fieldset>
@@ -58,7 +61,7 @@
     <div class="team-formation">
       <div class="team-controls">
         <label>
-          <h2>Name</h2>
+          <p>Name</p>
           <input class="team-name"></input>
           <span class="team-message"></span>
           <button class="btn-upload-team">Upload Team</button>

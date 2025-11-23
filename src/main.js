@@ -42,36 +42,39 @@ let currentMatch = null;
 let currentTick = 0;
 
 document.updatePlayersDefaultPosition = () => {
-  if(document.querySelector(".team-formation").style.display === "none"){
-    // first team is Team A, and is not showing, so we are showing team b
-    let teamdata = teamB.getTeamData();
-    render.renderField();
-    render.renderPlayer(render.width * (100 - teamdata["players"][0]["defaultZone"]["x"]) / 100,
-                        render.height - render.height * (100 - teamdata["players"][0]["defaultZone"]["y"]) / 100,
-                        "#b676ff", 0, false, "Goalkeeper");
-    render.renderPlayer(render.width * (100 - teamdata["players"][1]["defaultZone"]["x"]) / 100,
-                        render.height - render.height * (100 - teamdata["players"][1]["defaultZone"]["y"]) / 100,
-                        "#b676ff", 0, false, "Defender");
-    render.renderPlayer(render.width * (100 - teamdata["players"][2]["defaultZone"]["x"]) / 100,
-                        render.height - render.height * (100 - teamdata["players"][2]["defaultZone"]["y"]) / 100,
-                        "#b676ff", 0, false, "Striker");
-  } else {
-    let teamdata = teamA.getTeamData();
-    render.renderField();
-    render.renderPlayer(render.width * teamdata["players"][0]["defaultZone"]["x"] / 100,
-                        render.height - render.height * teamdata["players"][0]["defaultZone"]["y"] / 100,
-                        "#fd9946", 0, false, "Goalkeeper");
-    render.renderPlayer(render.width * teamdata["players"][1]["defaultZone"]["x"] / 100,
-                        render.height - render.height * teamdata["players"][1]["defaultZone"]["y"] / 100,
-                        "#fd9946", 0, false, "Defender");
-    render.renderPlayer(render.width * teamdata["players"][2]["defaultZone"]["x"] / 100,
-                        render.height - render.height * teamdata["players"][2]["defaultZone"]["y"] / 100,
-                        "#fd9946", 0, false, "Striker");
+  if(document.getElementById("matchpercent").textContent == "0" || document.getElementById("matchpercent").textContent == "100"){
+    if(document.querySelector(".team-formation").style.display === "none"){
+      // first team is Team A, and is not showing, so we are showing team b
+      let teamdata = teamB.getTeamData();
+      render.renderField();
+      render.renderPlayer(render.width * (100 - teamdata["players"][0]["defaultZone"]["x"]) / 100,
+                          render.height - render.height * (100 - teamdata["players"][0]["defaultZone"]["y"]) / 100,
+                          "#b676ff", 0, false, "Goalkeeper");
+      render.renderPlayer(render.width * (100 - teamdata["players"][1]["defaultZone"]["x"]) / 100,
+                          render.height - render.height * (100 - teamdata["players"][1]["defaultZone"]["y"]) / 100,
+                          "#b676ff", 0, false, "Defender");
+      render.renderPlayer(render.width * (100 - teamdata["players"][2]["defaultZone"]["x"]) / 100,
+                          render.height - render.height * (100 - teamdata["players"][2]["defaultZone"]["y"]) / 100,
+                          "#b676ff", 0, false, "Striker");
+    } else {
+      let teamdata = teamA.getTeamData();
+      render.renderField();
+      render.renderPlayer(render.width * teamdata["players"][0]["defaultZone"]["x"] / 100,
+                          render.height - render.height * teamdata["players"][0]["defaultZone"]["y"] / 100,
+                          "#fd9946", 0, false, "Goalkeeper");
+      render.renderPlayer(render.width * teamdata["players"][1]["defaultZone"]["x"] / 100,
+                          render.height - render.height * teamdata["players"][1]["defaultZone"]["y"] / 100,
+                          "#fd9946", 0, false, "Defender");
+      render.renderPlayer(render.width * teamdata["players"][2]["defaultZone"]["x"] / 100,
+                          render.height - render.height * teamdata["players"][2]["defaultZone"]["y"] / 100,
+                          "#fd9946", 0, false, "Striker");
+    }
   }
 }
 document.updatePlayersDefaultPosition();
+setTimeout(document.updatePlayersDefaultPosition, 100); // idk why
 
-let renderTick = () => {
+let renderTick = (loop=true) => {
   render.update(currentMatch[currentTick]);
 
   // update player state
@@ -121,7 +124,7 @@ let renderTick = () => {
 
   currentTick++;
   document.getElementById("matchpercent").textContent = Math.floor(100 * currentTick / currentMatch.length);
-  if(currentTick < currentMatch.length){
+  if(loop && currentTick < currentMatch.length){
     currentSetTimeoutID = setTimeout(renderTick, SPEED);
   }
 }
@@ -131,9 +134,17 @@ document.getElementById("pausebutton").addEventListener("click", ()=>{
   if(currentSetTimeoutID){
     clearTimeout(currentSetTimeoutID);
     currentSetTimeoutID = null;
+    document.getElementById("pausebutton").textContent = "Play";
   } else {
+    document.getElementById("pausebutton").textContent = "Pause";
     renderTick();
   }
+});
+// restart
+document.getElementById("restartbutton").addEventListener("click", ()=>{
+  currentTick = 0;
+  renderTick(false);
+  document.getElementById("log").addLog("-------");
 });
 
 // load match
@@ -154,6 +165,8 @@ loadBtn.addEventListener("click", () => {
   }).then( (response) => {
     return response.json();
   }).then( (data) => {
+    document.getElementById("pausebutton").disabled = false;
+    document.getElementById("restartbutton").disabled = false;
     loadBtn.disabled = false;
     currentMatch = data["match"];
     teamA.setMyTeamHasBall(false);
@@ -162,7 +175,7 @@ loadBtn.addEventListener("click", () => {
     document.getElementById("teambscore").textContent = 0;
     document.getElementById("teamalabel").textContent = teamA.getTeamName();
     document.getElementById("teamblabel").textContent = teamB.getTeamName();
-    document.getElementById("log").innerHTML = "";
+    document.getElementById("log").addLog("-------");
     currentTick = 0;
     renderTick();
   });
@@ -175,10 +188,20 @@ document.getElementById("log").addLog = function(log){
   document.getElementById("log").innerHTML = log + "<br>" + document.getElementById("log").innerHTML;
 };
 
-fetch(CONSTANTS.server_url+"getteams")
-.then( (response) => {
-  return response.json();
-}).then( ({data}) => {
-  teamA.setFormations(data);
-  teamB.setFormations(data);
-});
+// update teams to select
+document.updateTeams = () => {
+  document.querySelectorAll(".btn-select-team").forEach( (btn) => {
+    btn.disabled = true;
+  });
+  fetch(CONSTANTS.server_url+"getteams")
+  .then( (response) => {
+    return response.json();
+  }).then( ({data}) => {
+    document.querySelectorAll(".btn-select-team").forEach( (btn) => {
+      btn.disabled = false;
+    });
+    teamA.setFormations(data);
+    teamB.setFormations(data);
+  });
+}
+document.updateTeams();

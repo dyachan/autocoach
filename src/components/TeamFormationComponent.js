@@ -203,6 +203,7 @@ export class TeamFormationComponent {
       }).then( (response) => {
         if(response.success){
           this.root.querySelector(".team-message").textContent = "Uploaded :)";
+          document.updateTeams();
         } else {
           this.root.querySelector(".team-message").textContent = response.error + " :(";
         }
