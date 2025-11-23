@@ -35,10 +35,18 @@ export class RenderComponent {
     this.ctx.fillStyle = color;
 
     this.ctx.beginPath();
+    this.ctx.arc(x, y, this.PLAYER_SIZE*2, 0, Math.PI * 2);
+    this.ctx.fillStyle = color+"00";
+    this.ctx.fill();
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeStyle = color+"17";
+    this.ctx.stroke();
+    this.ctx.fillStyle = color;
     if(cooldown > 0){
+      this.ctx.beginPath();
       this.ctx.arc( x, y, this.PLAYER_SIZE*0.5, 0, Math.max(0, Math.PI * 2 - cooldown*0.3) );
       this.ctx.fill();
-      this.ctx.fillStyle += "55";
+      this.ctx.fillStyle = color+"55";
     }
     this.ctx.beginPath();
     this.ctx.arc(x, y, this.PLAYER_SIZE*0.5, 0, Math.PI * 2);
@@ -64,8 +72,20 @@ export class RenderComponent {
     // center line
     this.ctx.strokeStyle = "#ffffff44";
     this.ctx.beginPath();
-    this.ctx.moveTo(0, this.height / 2);
-    this.ctx.lineTo(this.width, this.height / 2);
+    this.ctx.moveTo(0, this.height * 0.5);
+    this.ctx.lineTo(this.width, this.height * 0.5);
+    this.ctx.stroke();
+
+    // goals lines
+    this.ctx.strokeStyle = "#ffffff17";
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, this.height * 0.3);
+    this.ctx.lineTo(this.width, this.height * 0.3);
+    this.ctx.stroke();
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, this.height * 0.7);
+    this.ctx.lineTo(this.width, this.height * 0.7);
     this.ctx.stroke();
 
     // goals

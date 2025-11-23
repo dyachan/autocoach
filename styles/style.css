@@ -69,6 +69,7 @@ p {
 label{
   display: flex;
   flex-direction: row;
+  align-items: center;
   gap: var(--gap);
 }
 
@@ -234,6 +235,7 @@ select {
 }
 .team-controls button{
   min-width: 90px;
+  min-height: 25px;
 }
 
 .matchpanel{
@@ -244,7 +246,7 @@ select {
 }
 
 .matchpanel fieldset{
-  width: 400px;
+  width: 500px;
   height: 590px;
   overflow-y: scroll;
 }

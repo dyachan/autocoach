@@ -40,6 +40,12 @@ let render = new RenderComponent();
 let currentSetTimeoutID = null;
 let currentMatch = null;
 let currentTick = 0;
+document.setCurrentTick = (tick) => {
+  currentTick = tick;
+  bloqLog = true;
+  renderTick(false);
+  bloqLog = false;
+}
 
 document.updatePlayersDefaultPosition = () => {
   if(document.getElementById("matchpercent").textContent == "0" || document.getElementById("matchpercent").textContent == "100"){
@@ -122,7 +128,9 @@ let renderTick = (loop=true) => {
     }
   });
 
-  currentTick++;
+  if(loop){
+    currentTick++;
+  }
   document.getElementById("matchpercent").textContent = Math.floor(100 * currentTick / currentMatch.length);
   if(loop && currentTick < currentMatch.length){
     currentSetTimeoutID = setTimeout(renderTick, SPEED);
@@ -134,17 +142,13 @@ document.getElementById("pausebutton").addEventListener("click", ()=>{
   if(currentSetTimeoutID){
     clearTimeout(currentSetTimeoutID);
     currentSetTimeoutID = null;
-    document.getElementById("pausebutton").textContent = "Play";
-  } else {
-    document.getElementById("pausebutton").textContent = "Pause";
+  } else if(document.getElementById("matchpercent").textContent != "100"){
     renderTick();
   }
 });
 // restart
 document.getElementById("restartbutton").addEventListener("click", ()=>{
-  currentTick = 0;
-  renderTick(false);
-  document.getElementById("log").addLog("-------");
+  document.setCurrentTick(0);
 });
 
 // load match
@@ -175,17 +179,29 @@ loadBtn.addEventListener("click", () => {
     document.getElementById("teambscore").textContent = 0;
     document.getElementById("teamalabel").textContent = teamA.getTeamName();
     document.getElementById("teamblabel").textContent = teamB.getTeamName();
-    document.getElementById("log").addLog("-------");
     currentTick = 0;
+    maxTickLog = 0;
+    document.getElementById("log").addLog("-------");
     renderTick();
   });
 });
 
 // log system
+let bloqLog = false;
+let maxTickLog = 0;
 document.getElementById("log").addLog = function(log){
-  log = log.replace("Team A", "<span class='teamacolor'>"+teamA.getTeamName()+"</span>")
-           .replace("Team B", "<span class='teambcolor'>"+teamB.getTeamName()+"</span>");
-  document.getElementById("log").innerHTML = log + "<br>" + document.getElementById("log").innerHTML;
+  if(bloqLog) return;
+  
+  if(currentTick > maxTickLog){
+    log = log.replace("Team A", "<span class='teamacolor'>"+teamA.getTeamName()+"</span>")
+    .replace("Team B", "<span class='teambcolor'>"+teamB.getTeamName()+"</span>");
+    document.getElementById("log").innerHTML = 
+    "("+Math.ceil(100*currentTick/currentMatch.length)+"%) " +
+    "<button onclick='document.setCurrentTick("+currentTick+")'>></button> " + 
+    log + "<br>" + document.getElementById("log").innerHTML;
+
+    maxTickLog = currentTick;
+  }
 };
 
 // update teams to select
