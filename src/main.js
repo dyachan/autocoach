@@ -28,6 +28,8 @@ const actions = [
     "Change side"
 ]
 
+const Log = document.getElementById("log");
+
 // create formations
 let teamA = new TeamFormationComponent("Team A", conditions, actions);
 document.getElementById("editorPanel").appendChild(teamA.root);
@@ -39,6 +41,7 @@ teamB.root.style.display = "none";
 let render = new RenderComponent();
 let currentSetTimeoutID = null;
 let currentMatch = null;
+let currentSummary = null;
 let currentTick = 0;
 document.setCurrentTick = (tick) => {
   currentTick = tick;
@@ -92,7 +95,7 @@ let renderTick = (loop=true) => {
   teamB.setCurrentRule("Striker", currentMatch[currentTick]["teamB"]["striker"]["condition"]);
 
   currentMatch[currentTick]["logs"].forEach( (log) => {
-    document.getElementById("log").addLog(log);
+    Log.addLog(log);
 
     // check goals
     if(log.includes("do a goal")){
@@ -135,6 +138,56 @@ let renderTick = (loop=true) => {
   if(loop && currentTick < currentMatch.length){
     currentSetTimeoutID = setTimeout(renderTick, SPEED);
   }
+
+  if(currentTick == currentMatch.length){
+    let tpl = document.getElementById("tpl-team-summary-item");
+    let node = tpl.content.cloneNode(true);
+
+    let teamname = node.querySelector("legend");
+    teamname.textContent = teamB.getTeamName();
+    teamname.classList.add("teambcolor");
+
+    node.querySelector(".summary-possession-value").textContent = Math.round(100*currentSummary["possessionB"] / currentSummary["totalTime"])+"%";
+
+    let container = node.querySelector(".team-summary-item");
+    Log.insertBefore(container, Log.firstChild);
+
+    let addPlayer = (playerSummary) => {
+      tpl = document.getElementById("tpl-player-summary-item");
+      node = tpl.content.cloneNode(true);
+  
+      node.querySelector(".summary-name").textContent = playerSummary['name'];
+      node.querySelector(".summary-distance-value").textContent = Math.round(playerSummary['distanceTraveled'])+" ("+Math.round(playerSummary['distanceTraveledWithBall'])+")";
+      node.querySelector(".summary-marked-value").textContent = Math.round(playerSummary['timeMarkedWithPossession'])+"% - "+Math.round(playerSummary['timeMarkedWithoutPossession'])+"%";
+      node.querySelector(".summary-pass-value").textContent = playerSummary['passesMade']+" ("+playerSummary['passesAchieved']+")";
+      node.querySelector(".summary-shoot-value").textContent = playerSummary['shootMade']+" ("+playerSummary['goals']+")";
+      node.querySelector(".summary-steal-value").textContent = playerSummary['takedoffBalls']+" ("+playerSummary['stealedBalls']+")";
+      node.querySelector(".summary-control-value").textContent = playerSummary['controledBalls']+" - "+playerSummary['interceptedBalls']+" - "+playerSummary['dribbledBalls'];
+
+      return node.querySelector(".player-summary-item");
+    };
+    currentSummary["TeamB"].forEach( (playerSummary) => {
+      container.appendChild(addPlayer(playerSummary));
+    })
+
+
+    tpl = document.getElementById("tpl-team-summary-item");
+    node = tpl.content.cloneNode(true);
+
+    teamname = node.querySelector("legend");
+    teamname.textContent = teamA.getTeamName();
+    teamname.classList.add("teamacolor");
+
+    node.querySelector(".summary-possession-value").textContent = Math.round(100*currentSummary["possessionA"] / currentSummary["totalTime"])+"%";
+
+    container = node.querySelector(".team-summary-item");
+    Log.insertBefore(container, Log.firstChild);
+
+    currentSummary["TeamA"].forEach( (playerSummary) => {
+      container.appendChild(addPlayer(playerSummary));
+    })
+
+  }
 }
 
 // play / pause
@@ -173,6 +226,7 @@ loadBtn.addEventListener("click", () => {
     document.getElementById("restartbutton").disabled = false;
     loadBtn.disabled = false;
     currentMatch = data["match"];
+    currentSummary = data["summary"];
     teamA.setMyTeamHasBall(false);
     teamB.setMyTeamHasBall(false);
     document.getElementById("teamascore").textContent = 0;
@@ -181,7 +235,7 @@ loadBtn.addEventListener("click", () => {
     document.getElementById("teamblabel").textContent = teamB.getTeamName();
     currentTick = 0;
     maxTickLog = 0;
-    document.getElementById("log").addLog("-------");
+    Log.addLog("-------");
     renderTick();
   });
 });
@@ -189,16 +243,34 @@ loadBtn.addEventListener("click", () => {
 // log system
 let bloqLog = false;
 let maxTickLog = 0;
-document.getElementById("log").addLog = function(log){
+Log.addLog = function(log){
   if(bloqLog) return;
   
   if(currentTick > maxTickLog){
-    log = log.replace("Team A", "<span class='teamacolor'>"+teamA.getTeamName()+"</span>")
-    .replace("Team B", "<span class='teambcolor'>"+teamB.getTeamName()+"</span>");
-    document.getElementById("log").innerHTML = 
-    "("+Math.ceil(100*currentTick/currentMatch.length)+"%) " +
-    "<button onclick='document.setCurrentTick("+currentTick+")'>></button> " + 
-    log + "<br>" + document.getElementById("log").innerHTML;
+    let tpl = document.getElementById("tpl-log-item");
+    let node = tpl.content.cloneNode(true);
+
+    const time = node.querySelector(".log-time");
+    time.textContent = Math.ceil(100*currentTick/currentMatch.length) + "%";
+
+    const btn = node.querySelector(".log-btn");
+    btn.addEventListener("click", () => {
+      document.setCurrentTick(currentTick);
+    });
+
+    const team = node.querySelector(".log-team");
+    if(log.startsWith("Team A")){
+      team.classList.add("teamacolor");
+      team.textContent = teamA.getTeamName();
+    } else if(log.startsWith("Team B")){
+      team.classList.add("teambcolor");
+      team.textContent = teamB.getTeamName();
+    }
+
+    const msg = node.querySelector(".log-msg");
+    msg.textContent = log = log.replace("Team A", "").replace("Team B", "");
+
+    Log.insertBefore(node.querySelector(".log-item"), Log.firstChild);
 
     maxTickLog = currentTick;
   }
@@ -209,7 +281,7 @@ document.updateTeams = () => {
   document.querySelectorAll(".btn-select-team").forEach( (btn) => {
     btn.disabled = true;
   });
-  fetch(CONSTANTS.server_url+"getteams")
+  return fetch(CONSTANTS.server_url+"getteams")
   .then( (response) => {
     return response.json();
   }).then( ({data}) => {
@@ -220,4 +292,7 @@ document.updateTeams = () => {
     teamB.setFormations(data);
   });
 }
-document.updateTeams();
+document.updateTeams().then( () => {
+  // server respond
+  loadBtn.disabled = false;
+});

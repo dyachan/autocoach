@@ -102,6 +102,7 @@ button {
   padding: auto;
   cursor: pointer;
   opacity: 0.8;
+  position: relative;
 }
 
 button:hover {
@@ -245,10 +246,32 @@ select {
   align-items: center;
 }
 
-.matchpanel fieldset{
+.matchinfo > fieldset{
   width: 500px;
   height: 590px;
   overflow-y: scroll;
+}
+
+.summary-label{
+  font-size: 0.8em;
+  color: var(--disabled-color);
+}
+
+.summary-name{
+  margin-top: var(--gap-small);
+  margin-bottom: var(--gap-small);
+  font-size: 1.2em;
+}
+
+.player-summary-item label{
+  justify-content: space-between;
+}
+
+.log-time{
+  font-size: 0.6em;
+  width: 20px;
+  display: inline-block;
+  color: var(--disabled-color);
 }
 
 .teamacolor{
@@ -278,3 +301,18 @@ button:disabled {
   cursor: default;
 }
 
+.loader {
+  display: none;
+  width: 40px;
+  position: absolute;
+  right: var(--gap-small);
+  bottom: var(--gap-small);
+  aspect-ratio: 4;
+  background: radial-gradient(circle closest-side,var(--font-color) 90%,#0000) 0/calc(100%/3) 100% no-repeat;
+  animation: l2 1s steps(3) infinite;
+}
+@keyframes l2 {to{background-position: 150%}}
+
+button:disabled .loader{
+  display: inline;
+}

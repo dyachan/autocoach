@@ -13,7 +13,7 @@
   <main>
     <section class="matchpanel">
       <article class="matchcontrols">
-        <button id="btn-init-match">Load</button>
+        <button id="btn-init-match" disabled>Load <span class="loader"></span> </button>
         <span id="matchpercent">0</span><span>%</span>
         <button id="restartbutton" disabled>Restart</button>
         <button id="pausebutton" disabled>Pause</button>
@@ -68,7 +68,7 @@
         </label>
         <label>
           <select class="team-selection"></select>
-          <button class="btn-select-team">Select Team</button>
+          <button class="btn-select-team">Select Team <span class="loader"></span> </button>
           <div style="flex-grow: 2;"></div>
           <button class="btn-change-team" onclick="toggleTeam()">Other team</button>
         </label>
@@ -120,6 +120,64 @@
       <span class="reservedword">THEN</span>
       <select class="rule-action"></select>
       <button class="btn-delete warning">✖</button>
+    </div>
+  </template>
+
+  <!-- Log Item Template -->
+  <template id="tpl-log-item">
+    <div class="log-item">
+      <span class="log-time"></span>
+      <button class="log-btn">></button>
+      <span class="log-team"></span>
+      <span class="log-msg"></span>
+    </div>
+  </template>
+
+  <!-- Team Summary Template -->
+  <template id="tpl-team-summary-item">
+    <fieldset class="team-summary-item">
+      <legend>Team</legend>
+      <label>
+        <span class="summary-possession-label summary-label">Possession: </span>
+        <span class="summary-possession-value">0 %</span>
+      </label>
+    </fieldset>
+  </template>
+
+  <!-- Player Summary Template -->
+  <template id="tpl-player-summary-item">
+    <div class="player-summary-item">
+      <span class="summary-name">Player</span>
+
+      <label>
+        <span class="summary-distance-label summary-label">Distance traveled (with ball): </span>
+        <span class="summary-distance-value">0 (0)</span>
+      </label>
+
+      <label>
+        <span class="summary-marked-label summary-label">Time marked Team with ball - Team without ball: </span>
+        <span class="summary-marked-value">0% - 0%</span>
+      </label>
+
+      <label>
+        <span class="summary-pass-label summary-label">Passes made (achieved): </span>
+        <span class="summary-pass-value">0 (0)</span>
+      </label>
+
+      <label>
+        <span class="summary-shoot-label summary-label">Shoots made (goals): </span>
+        <span class="summary-shoot-value">0 (0)</span>
+      </label>
+
+      <label>
+        <span class="summary-steal-label summary-label">Take off balls (stealed): </span>
+        <span class="summary-steal-value">0 (0)</span>
+      </label>
+
+      <label>
+        <span class="summary-control-label summary-label">Controled - Intercepted - Dribbled Balls: </span>
+        <span class="summary-control-value">0 - 0 - 0</span>
+      </label>
     </div>
   </template>
 
