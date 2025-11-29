@@ -36,6 +36,15 @@ document.getElementById("editorPanel").appendChild(teamA.root);
 let teamB = new TeamFormationComponent("Team B", conditions, actions);
 document.getElementById("editorPanel").appendChild(teamB.root);
 teamB.root.style.display = "none";
+document.getElementById("hidecontrolsbtn").addEventListener( "click", () => {
+  if(teamA.root.style.width){
+    teamA.root.style.width = null;
+    teamB.root.style.width = null;
+  } else {
+    teamA.root.style.width = "0px";
+    teamB.root.style.width = "0px";
+  }
+});
 
 // render
 let render = new RenderComponent();

@@ -216,6 +216,7 @@ select {
 
 
 .team-formation {
+  background: var(--background-panel-color);
   padding: var(--gap);
   display: flex;
   flex-direction: column;
@@ -247,7 +248,7 @@ select {
 }
 
 .matchinfo > fieldset{
-  width: 500px;
+  width: 450px;
   height: 590px;
   overflow-y: scroll;
 }
@@ -272,6 +273,10 @@ select {
   width: 20px;
   display: inline-block;
   color: var(--disabled-color);
+}
+
+.log-team{
+  font-size: 0.8em;
 }
 
 .teamacolor{

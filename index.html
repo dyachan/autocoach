@@ -8,12 +8,16 @@
 </head>
 <body>
   <header id="editorPanel">
+    <button id="hidecontrolsbtn"></button>
   </header>
   
   <main>
+    <!-- <section id="editorPanel">
+    </section> -->
+
     <section class="matchpanel">
       <article class="matchcontrols">
-        <button id="btn-init-match" disabled>Load <span class="loader"></span> </button>
+        <button id="btn-init-match" disabled>Simulate<span class="loader"></span> </button>
         <span id="matchpercent">0</span><span>%</span>
         <button id="restartbutton" disabled>Restart</button>
         <button id="pausebutton" disabled>Pause</button>
@@ -160,6 +164,11 @@
       </label>
 
       <label>
+        <span class="summary-steal-label summary-label">Take off balls (stealed): </span>
+        <span class="summary-steal-value">0 (0)</span>
+      </label>
+
+      <label>
         <span class="summary-pass-label summary-label">Passes made (achieved): </span>
         <span class="summary-pass-value">0 (0)</span>
       </label>
@@ -167,11 +176,6 @@
       <label>
         <span class="summary-shoot-label summary-label">Shoots made (goals): </span>
         <span class="summary-shoot-value">0 (0)</span>
-      </label>
-
-      <label>
-        <span class="summary-steal-label summary-label">Take off balls (stealed): </span>
-        <span class="summary-steal-value">0 (0)</span>
       </label>
 
       <label>
