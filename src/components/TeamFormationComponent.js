@@ -223,6 +223,11 @@ export class TeamFormationComponent {
   setFormations(formations) {
     this.formations = formations;
     const selectDom = this.root.querySelector(".team-selection");
+
+    while (selectDom.firstChild) {
+      selectDom.removeChild(selectDom.lastChild);
+    }
+
     formations.forEach( (formation) => {
       const opt = document.createElement("option");
       opt.textContent = formation.name;

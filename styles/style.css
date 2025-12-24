@@ -126,7 +126,7 @@ select {
   min-width: 30px;
 }
 .matchinfo label{
-  min-height: 30px;
+  padding: var(--gap-small);
 }
 
 .import-area {
@@ -266,6 +266,10 @@ select {
 
 .player-summary-item label{
   justify-content: space-between;
+  border-radius: var(--gap-small);
+}
+.player-summary-item label:nth-child(odd){
+  background-color: var(--background-panel-color);
 }
 
 .log-time{

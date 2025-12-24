@@ -53,6 +53,7 @@ let currentMatch = null;
 let currentSummary = null;
 let currentTick = 0;
 document.setCurrentTick = (tick) => {
+  console.log("setCurrentTick", tick);
   currentTick = tick;
   bloqLog = true;
   renderTick(false);
@@ -157,26 +158,30 @@ let renderTick = (loop=true) => {
     teamname.classList.add("teambcolor");
 
     node.querySelector(".summary-possession-value").textContent = Math.round(100*currentSummary["possessionB"] / currentSummary["totalTime"])+"%";
+    node.querySelector(".summary-goals-value").textContent = currentSummary["GoalsB"];
 
     let container = node.querySelector(".team-summary-item");
     Log.insertBefore(container, Log.firstChild);
 
-    let addPlayer = (playerSummary) => {
+    let addPlayer = (playerSummary, classColor) => {
       tpl = document.getElementById("tpl-player-summary-item");
       node = tpl.content.cloneNode(true);
   
       node.querySelector(".summary-name").textContent = playerSummary['name'];
+      node.querySelector(".summary-name").classList.add(classColor);
       node.querySelector(".summary-distance-value").textContent = Math.round(playerSummary['distanceTraveled'])+" ("+Math.round(playerSummary['distanceTraveledWithBall'])+")";
       node.querySelector(".summary-marked-value").textContent = Math.round(playerSummary['timeMarkedWithPossession'])+"% - "+Math.round(playerSummary['timeMarkedWithoutPossession'])+"%";
+      node.querySelector(".summary-control-value").textContent = playerSummary['controledBalls']+" - "+playerSummary['interceptedBalls'];
       node.querySelector(".summary-pass-value").textContent = playerSummary['passesMade']+" ("+playerSummary['passesAchieved']+")";
       node.querySelector(".summary-shoot-value").textContent = playerSummary['shootMade']+" ("+playerSummary['goals']+")";
-      node.querySelector(".summary-steal-value").textContent = playerSummary['takedoffBalls']+" ("+playerSummary['stealedBalls']+")";
-      node.querySelector(".summary-control-value").textContent = playerSummary['controledBalls']+" - "+playerSummary['interceptedBalls']+" - "+playerSummary['dribbledBalls'];
+      node.querySelector(".summary-challenged-value").textContent = playerSummary['challengedMeWithBall']+" - "+playerSummary['challengedRivalWithBall'];
+      node.querySelector(".summary-steal-value").textContent = (playerSummary['takedoffBalls']+playerSummary['stealedBalls'])+" ("+playerSummary['stealedBalls']+")";
+      node.querySelector(".summary-dribbled-value").textContent = playerSummary['dribbleDone']+" - "+playerSummary['dribbleFailed'];
 
       return node.querySelector(".player-summary-item");
     };
     currentSummary["TeamB"].forEach( (playerSummary) => {
-      container.appendChild(addPlayer(playerSummary));
+      container.appendChild(addPlayer(playerSummary, "teambcolor"));
     })
 
 
@@ -188,12 +193,13 @@ let renderTick = (loop=true) => {
     teamname.classList.add("teamacolor");
 
     node.querySelector(".summary-possession-value").textContent = Math.round(100*currentSummary["possessionA"] / currentSummary["totalTime"])+"%";
+    node.querySelector(".summary-goals-value").textContent = currentSummary["GoalsA"];
 
     container = node.querySelector(".team-summary-item");
     Log.insertBefore(container, Log.firstChild);
 
     currentSummary["TeamA"].forEach( (playerSummary) => {
-      container.appendChild(addPlayer(playerSummary));
+      container.appendChild(addPlayer(playerSummary, "teamacolor"));
     })
 
   }
@@ -263,8 +269,9 @@ Log.addLog = function(log){
     time.textContent = Math.ceil(100*currentTick/currentMatch.length) + "%";
 
     const btn = node.querySelector(".log-btn");
+    const thisTick = currentTick;
     btn.addEventListener("click", () => {
-      document.setCurrentTick(currentTick);
+      document.setCurrentTick(thisTick);
     });
 
     const team = node.querySelector(".log-team");
