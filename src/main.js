@@ -108,7 +108,7 @@ let renderTick = (loop=true) => {
     Log.addLog(log);
 
     // check goals
-    if(log.includes("do a goal")){
+    if(log.includes("a goal") || log.includes("autogoal")){
       if(log.includes("Team A")){
         document.getElementById("teamascore").textContent = parseInt(document.getElementById("teamascore").textContent) + 1;
       } else {
