@@ -53,7 +53,6 @@ let currentMatch = null;
 let currentSummary = null;
 let currentTick = 0;
 document.setCurrentTick = (tick) => {
-  console.log("setCurrentTick", tick);
   currentTick = tick;
   bloqLog = true;
   renderTick(false);

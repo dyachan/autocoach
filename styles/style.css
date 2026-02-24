@@ -4,7 +4,7 @@
   --font-color: #eee;
   --primary-color: #76ff7a;
   --primary-background-color: #2d662d;
-  --warning-color: #ff7676;
+  --warning-color: #ffcbcb;
   --warning-background-color: #662d2d;
   --active-background-color: #662d2d55;
   --reserverd-color: #4faa52;
@@ -43,6 +43,8 @@ header {
   z-index: 1;
   max-height: 100%;
   gap: var(--gap);
+  margin-left: var(--gap);
+  max-width: 99vw;
 }
 
 main {
@@ -70,7 +72,7 @@ label{
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--gap-small);
 }
 
 canvas {
@@ -125,6 +127,9 @@ select {
   display: inline-block;
   min-width: 30px;
 }
+.matchinfo{
+  width: 400px;
+}
 .matchinfo label{
   padding: var(--gap-small);
 }
@@ -138,12 +143,17 @@ select {
 }
 
 .team-message {
-  flex: 2 1 0;            /* grow sí, pero con base 0 y permitido encoger */
-  min-width: 0;           /* clave para que pueda romper línea dentro de flex */
+  min-width: 250px;           /* clave para que pueda romper línea dentro de flex */
   white-space: normal;    /* permite saltos de línea */
   overflow-wrap: break-word; /* si hay palabras largas, que se partan */
   color: var(--warning-color);
-  font-size: 0.7em;
+  font-size: 0.9em;
+  background-color: var(--warning-background-color);
+  padding: var(--gap-small);
+  border-radius: var(--gap-small) 0 var(--gap-small) var(--gap-small) ;
+  position: absolute;
+  top: 0;
+  left: -260px;
 }
 
 /* Player Instruction Component */
@@ -152,7 +162,10 @@ select {
   background: var(--background-color);
   padding: var(--gap);
   border-radius: var(--gap);
-  margin-bottom: var(--gap);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .player-instructions hr {
@@ -162,25 +175,30 @@ select {
 .player-instructions .player-name {
   margin-top: 0;
   margin-bottom: 8px;
-  font-size: 1.2em;
+  font-size: 1em;
   color: var(--primary-color);
 }
 
 .player-instructions section {
   display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--gap-small);
 }
 
 .player-instructions article  {
   background: var(--background-panel-color);
   border: thin solid var(--background-color);
   padding: var(--gap);
+  border-radius: var(--gap);
 }
-.player-instructions .myteamhasball {
+/* .player-instructions .myteamhasball {
   border-radius: var(--gap) 0px 0px var(--gap);
 }
 .player-instructions .myteamdonthasball {
   border-radius: 0px var(--gap) var(--gap) 0px;
-}
+} */
 
 .rule-item {
   border-radius: var(--gap-small);
@@ -245,10 +263,10 @@ select {
   flex-direction: column;
   gap: var(--gap);
   align-items: center;
+  padding: var(--gap-small);
 }
 
 .matchinfo > fieldset{
-  width: 450px;
   height: 590px;
   overflow-y: scroll;
 }
@@ -302,6 +320,7 @@ input {
   border: 1px solid var(--background-panel-color);
   border-radius: var(--gap-small);
   padding: var(--gap-small);
+  width: 40px;
 }
 
 button:disabled {
@@ -324,4 +343,8 @@ button:disabled {
 
 button:disabled .loader{
   display: inline;
+}
+
+.team-name{
+  width: auto;
 }

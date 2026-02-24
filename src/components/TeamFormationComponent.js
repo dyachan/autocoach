@@ -179,6 +179,7 @@ export class TeamFormationComponent {
     
     if(this.currentUploadClick < messages.length){ // before upload
       this.root.querySelector(".team-message").textContent = messages[this.currentUploadClick];
+      this.root.querySelector(".team-message").style.display = null;
       this.currentUploadClick++
       if(this.currentUploadTimeout){
         clearTimeout(this.currentUploadTimeout);
@@ -187,12 +188,14 @@ export class TeamFormationComponent {
       this.currentUploadTimeout = setTimeout(() => {
         this.currentUploadClick = 0;
         this.root.querySelector(".team-message").textContent = "";
+        this.root.querySelector(".team-message").style.display = "none";
       }, 5000);
     } else { // upload
       clearTimeout(this.currentUploadTimeout);
       this.currentUploadTimeout = null;
       this.currentUploadClick = 0;
       this.root.querySelector(".team-message").textContent = "Uploading";
+      this.root.querySelector(".team-message").style.display = null;
       this.root.querySelector(".btn-upload-team").disabled = true;
       fetch(CONSTANTS.server_url+"storeteam", {
         method: "POST",
@@ -203,9 +206,11 @@ export class TeamFormationComponent {
       }).then( (response) => {
         if(response.success){
           this.root.querySelector(".team-message").textContent = "Uploaded :)";
+          this.root.querySelector(".team-message").style.display = null;
           document.updateTeams();
         } else {
           this.root.querySelector(".team-message").textContent = response.error + " :(";
+          this.root.querySelector(".team-message").style.display = null;
         }
         this.root.querySelector(".btn-upload-team").disabled = false;
       }).catch( (error) => {

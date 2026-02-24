@@ -69,8 +69,10 @@ export class PlayerInstructionComponent {
 
     // Add event create rule
     container.querySelectorAll(".btn-add-rule").forEach((btn, index) => {
+      const container = this.rulesContainer[index];
       btn.addEventListener("click", () => {
-        this.rulesContainer[index].appendChild(this.createRule());
+        container.appendChild(this.createRule());
+        this.updateUpAndDownDisabled(container)
       });
     });
     
@@ -141,22 +143,32 @@ export class PlayerInstructionComponent {
     selectAct.addEventListener("change", () => this.triggerUpdate());
 
     btnDelete.addEventListener("click", () => {
+      const container = ruleEl.closest(".rules-container")
       ruleEl.remove();
+      this.updateUpAndDownDisabled(container);
       this.triggerUpdate();
     });
 
     btnUp.classList.add(this.teamBackground);
     btnUp.addEventListener("click", () => {
       const prev = ruleEl.previousElementSibling;
-      if (prev) ruleEl.closest(".rules-container").insertBefore(ruleEl, prev);
+      if (prev){
+        const container = ruleEl.closest(".rules-container");
+        container.insertBefore(ruleEl, prev);
+        this.updateUpAndDownDisabled(container);
+      }
       this.triggerUpdate();
     });
 
     btnDown.classList.add(this.teamBackground);
     btnDown.addEventListener("click", () => {
       const next = ruleEl.nextElementSibling;
-      if (next) ruleEl.closest(".rules-container").insertBefore(next, ruleEl);
-      this.triggerUpdate();
+      if (next){
+        const container = ruleEl.closest(".rules-container");
+        container.insertBefore(next, ruleEl);
+        this.updateUpAndDownDisabled(container);
+        this.triggerUpdate();
+      }
     });
 
     this.triggerUpdate();
@@ -186,6 +198,7 @@ export class PlayerInstructionComponent {
       rules.forEach( (r) => {
         this.rulesContainer[i].appendChild( this.createRule(r.condition, r.action) );
       });
+      this.updateUpAndDownDisabled(this.rulesContainer[i]);
     });
   }
 
@@ -194,5 +207,20 @@ export class PlayerInstructionComponent {
     if (typeof this.onUpdate === "function") {
       this.onUpdate(this.getRules());
     }
+  }
+
+  updateUpAndDownDisabled(container) {
+    const items = Array.from(container.querySelectorAll(".rule-item"));
+
+    items.forEach((item, index) => {
+      const btnUp = item.querySelector(".btn-up");
+      const btnDown = item.querySelector(".btn-down");
+
+      // disable / enable up
+      btnUp.disabled = index === 0;
+
+      // disable / enable down
+      btnDown.disabled = index === items.length - 1;
+    });
   }
 }

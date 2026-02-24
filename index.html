@@ -12,14 +12,11 @@
   </header>
   
   <main>
-    <!-- <section id="editorPanel">
-    </section> -->
-
     <section class="matchpanel">
       <article class="matchcontrols">
         <button id="btn-init-match" disabled>Simulate<span class="loader"></span> </button>
         <span id="matchpercent">0</span><span>%</span>
-        <button id="restartbutton" disabled>Restart</button>
+        <button id="restartbutton" disabled style="display: none;">Restart</button>
         <button id="pausebutton" disabled>Pause</button>
       </article>
       <canvas id="gameCanvas"></canvas>
@@ -67,8 +64,11 @@
         <label>
           <p>Name</p>
           <input class="team-name"></input>
-          <span class="team-message"></span>
-          <button class="btn-upload-team">Upload Team</button>
+          <div style="flex-grow: 2;"></div>
+          <button class="btn-upload-team">
+            <span class="team-message" style="display: none;"></span>
+            Upload Team
+          </button>
         </label>
         <label>
           <select class="team-selection"></select>
@@ -76,7 +76,7 @@
           <div style="flex-grow: 2;"></div>
           <button class="btn-change-team" onclick="toggleTeam()">Other team</button>
         </label>
-        <label style="justify-content: space-between">
+        <label style="justify-content: space-between; display: none;">
           <button class="btn-export-team">Export Team</button>
           <input class="import-area"></input>
           <button class="btn-import-team">Import Team</button>
@@ -89,10 +89,18 @@
   <!-- Player Instruction Template -->
   <template id="tpl-player-instruction">
     <section class="player-instructions">
-      <span class="player-name">Player</span>
-      <span class="reservedword">DEFAULT ZONE</span>
-      <input class="defaultzonex" type="number" min="0" max="100"></input>%
-      <input class="defaultzoney" type="number" min="0" max="100"></input>%
+      <section>
+        <label>
+          <span class="player-name">Player</span>
+        </label>
+        <label>
+          <span class="reservedword">DEFAULT ZONE</span>
+          <input class="defaultzonex" type="number" min="0" max="100"></input>
+          <span class="reservedword">%</span>
+          <input class="defaultzoney" type="number" min="0" max="100"></input>
+          <span class="reservedword">%</span>
+        </label>
+      </section>
 
       <section>
           <article class="myteamhasball">
@@ -162,7 +170,7 @@
       </label>
 
       <label>
-        <span class="summary-marked-label summary-label">Time marked Team with ball - Team without ball: </span>
+        <span class="summary-marked-label summary-label">Time marked Team has ball Yes - No: </span>
         <span class="summary-marked-value">0% - 0%</span>
       </label>
 
