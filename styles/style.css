@@ -1,4 +1,6 @@
 :root {
+  color-scheme: dark;
+  
   --background-color: #0c0c0c;
   --background-panel-color: #1a1a1a;
   --font-color: #eee;
