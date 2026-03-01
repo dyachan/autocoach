@@ -232,6 +232,51 @@ select {
   gap: var(--gap-small);
 }
 
+.btn-stats {
+  margin-top: var(--gap-small);
+  width: 100%;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.player-stats-container{
+  width: 100%;
+}
+.player-stats-container article{
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.player-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--gap-small);
+}
+.player-stats-grid label {
+  flex-direction: column;
+  gap: 2px;
+}
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.stat-header output {
+  font-size: 0.8em;
+  color: var(--disabled-color);
+}
+.player-stats-grid input[type="range"] {
+  width: 100%;
+  cursor: pointer;
+  padding: 0;
+}
+.stat-total-display {
+  grid-column: 1 / -1;
+  text-align: right;
+  font-size: 0.8em;
+  color: var(--disabled-color);
+}
 
 .team-formation {
   background: var(--background-panel-color);
@@ -312,6 +357,12 @@ select {
 }
 .teambbgcolor{
   background: var(--team-B-background-color);
+}
+.teamaacolor{
+  accent-color: var(--team-A-background-color);
+}
+.teambacolor{
+  accent-color: var(--team-B-background-color);
 }
 
 input {

@@ -67,9 +67,9 @@ export class TeamFormationComponent {
         () => this.triggerUpdate()
       );
       if(this.teamName === "Team A"){
-        playerComp.setTeamColor("teamacolor", "teamabgcolor");
+        playerComp.setTeamColor("teamacolor", "teamabgcolor", "teamaacolor");
       } else {
-        playerComp.setTeamColor("teambcolor", "teambbgcolor");
+        playerComp.setTeamColor("teambcolor", "teambbgcolor", "teambacolor");
       }
 
       playersWrapper.appendChild(playerComp.root);
@@ -120,7 +120,8 @@ export class TeamFormationComponent {
       players: this.players.map((p) => ({
         name: p.playerName,
         rules: p.getRules(),
-        defaultZone: p.getDefaultZoneValues()
+        defaultZone: p.getDefaultZoneValues(),
+        ...p.getStats()
       })),
     };
     return team;
@@ -133,6 +134,7 @@ export class TeamFormationComponent {
         this.players[idx].loadRules(pd.rules || [[],[]]);
         this.players[idx].defaultZone = pd.defaultZone;
         this.players[idx].setDefaultZoneValues();
+        this.players[idx].setStats(pd);
       }
     });
     this.triggerUpdate();

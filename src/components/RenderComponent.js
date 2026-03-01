@@ -35,7 +35,7 @@ export class RenderComponent {
     this.ctx.fillStyle = color;
 
     this.ctx.beginPath();
-    this.ctx.arc(x, y, this.PLAYER_SIZE*2, 0, Math.PI * 2);
+    this.ctx.arc(x, y, this.PLAYER_SIZE*1, 0, Math.PI * 2);
     this.ctx.fillStyle = color+"00";
     this.ctx.fill();
     this.ctx.lineWidth = 2;

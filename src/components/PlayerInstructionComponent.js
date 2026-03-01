@@ -81,7 +81,12 @@ export class PlayerInstructionComponent {
       element.textContent = this.actions[0];
     });
 
+    // Compute total budget
+    const statInputs = container.querySelectorAll(".stat-input");
+    this.maxTotal = statInputs.length * 0.5;
+
     this.root = container;
+    this.updateStatsDisplay();
     this.setDefaultZoneValues();
     this.root.querySelector(".defaultzonex").addEventListener("change", () => {
       document.updatePlayersDefaultPosition();
@@ -89,14 +94,38 @@ export class PlayerInstructionComponent {
     this.root.querySelector(".defaultzoney").addEventListener("change", () => {
       document.updatePlayersDefaultPosition();
     })
+
+    // Toggle stats panel visibility
+    const statsSection = container.querySelector(".player-stats-container");
+    statsSection.style.display = "none";
+    container.querySelector(".btn-stats").addEventListener("click", () => {
+      statsSection.style.display = statsSection.style.display === "none" ? null : "none";
+    });
+
+    // Update output label, enforce budget cap, and trigger update
+    statInputs.forEach((input) => {
+      input.addEventListener("input", () => {
+        const allInputs = Array.from(this.root.querySelectorAll(".stat-input"));
+        const sum = allInputs.reduce((acc, i) => acc + parseFloat(i.value), 0);
+        if (sum > this.maxTotal) {
+          input.value = Math.max(0, Math.round((parseFloat(input.value) - (sum - this.maxTotal)) * 100) / 100);
+        }
+        input.closest("label").querySelector("output").value = parseFloat(input.value).toFixed(2);
+        this.updateStatsDisplay();
+      });
+      input.addEventListener("change", () => this.triggerUpdate());
+    });
+
     return container;
   }
 
-  setTeamColor(colorClass, bgColorClass){
+  setTeamColor(colorClass, bgColorClass, aColorClass){
     this.teamColor = colorClass;
     this.teamBackground = bgColorClass;
     this.root.querySelector(".player-name").classList.add(colorClass);
+    this.root.querySelector(".btn-stats").classList.add(bgColorClass);
     this.root.querySelectorAll(".btn-add-rule").forEach( (b) => b.classList.add(bgColorClass) );
+    this.root.querySelectorAll(".stat-input").forEach( (b) => b.classList.add(aColorClass) );
   }
 
   setDefaultZoneValues(){
@@ -108,6 +137,32 @@ export class PlayerInstructionComponent {
       x: this.root.querySelector(".defaultzonex").value,
       y: this.root.querySelector(".defaultzoney").value
     };
+  }
+
+  getStats() {
+    const stats = {};
+    this.root.querySelectorAll(".stat-input").forEach((input) => {
+      stats[input.dataset.stat] = parseFloat(input.value);
+    });
+    return stats;
+  }
+
+  setStats(stats) {
+    if (!stats) return;
+    this.root.querySelectorAll(".stat-input").forEach((input) => {
+      if (stats[input.dataset.stat] !== undefined) {
+        input.value = stats[input.dataset.stat];
+        input.closest("label").querySelector("output").value = parseFloat(input.value);
+      }
+    });
+    this.updateStatsDisplay();
+  }
+
+  updateStatsDisplay() {
+    const allInputs = Array.from(this.root.querySelectorAll(".stat-input"));
+    const sum = allInputs.reduce((acc, i) => acc + parseFloat(i.value), 0);
+    this.root.querySelector(".stat-total-display").textContent =
+      `${Math.round(sum * 100) / 100} / ${this.maxTotal}`;
   }
 
   /** Create a new rule row */
