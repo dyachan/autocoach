@@ -4,30 +4,10 @@ import { LogSystem } from "./LogSystem.js";
 import { SummaryRenderer } from "./SummaryRenderer.js";
 import { MatchPlayer } from "./MatchPlayer.js";
 import { CONSTANTS } from "./Constants.js";
+import { CONDITIONS, ACTIONS } from "./PlayerRules.js";
 
-const conditions = [
-  "I has the ball",
-  "I am marked",
-  "I am near a rival",
-  "The ball is near my goal",
-  "The ball is in my side",
-  "The ball is in other side",
-  "The ball is near rival goal",
-  "Rival in my side",
-  "No rival in my side",
-];
-const actions = [
-  "Stay in my zone",
-  "Go to the ball",
-  "Go to near rival",
-  "Go to my goal",
-  "Go to rival goal",
-  "Go forward",
-  "Go back",
-  "Pass the ball",
-  "Shoot to goal",
-  "Change side",
-];
+const conditions = CONDITIONS;
+const actions = ACTIONS;
 
 // --- Field preview ---
 const render = new RenderComponent();

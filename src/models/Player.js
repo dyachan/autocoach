@@ -1,3 +1,5 @@
+import { A, C } from "../PlayerRules.js";
+
 export class Player {
   constructor({ team, name, rules, x, y, baseX, baseY, defaultAction, currentFieldSide }) {
     this.team = team;
@@ -131,11 +133,11 @@ export class Player {
     const { ball, teammates, opponents, fieldWidth, fieldHeight } = simState;
 
     switch (this.currentAction) {
-      case "Go to the ball":
+      case A.GO_TO_BALL: // "Go to the ball"
         this.target = { x: ball.x, y: ball.y };
         break;
 
-      case "Go to near rival":
+      case A.GO_TO_NEAR_RIVAL: // "Go to near rival"
         if (opponents.length > 0) {
           // Find closest opponent
           let closest = null;
@@ -157,23 +159,23 @@ export class Player {
         }
         break;
 
-      case "Go to my goal":
+      case A.GO_TO_MY_GOAL: // "Go to my goal"
         this.target = {x: (this.currentFieldSide === "left" ? 10 : fieldWidth-10), y: fieldHeight / 2};
         break;
 
-      case "Go to rival goal":
+      case A.GO_TO_RIVAL_GOAL: // "Go to rival goal"
         this.target = {x: (this.currentFieldSide === "left" ? fieldWidth-10 : 10), y: fieldHeight / 2};
         break;
 
-      case "Go forward":
+      case A.GO_FORWARD: // "Go forward"
         this.target = {x: (this.currentFieldSide === "left" ? fieldWidth-10 : 10), y: this.y};
         break;
 
-      case "Go back":
+      case A.GO_BACK: // "Go back"
         this.target = {x: (this.currentFieldSide === "left" ? 10 : fieldWidth-10), y: this.y};
         break;
 
-      case "Pass the ball":
+      case A.PASS: // "Pass the ball"
         // find free mate
         if (this.hasBall) {
           // Filter out marked teammates first
@@ -219,7 +221,7 @@ export class Player {
         }
         break;
 
-      case "Shoot to goal":
+      case A.SHOOT: // "Shoot to goal"
         if(this.hasBall){
           this.ballCooldown = 30;
           this.hasBall = false;
@@ -228,7 +230,7 @@ export class Player {
         }
         break;
 
-      case "Change side":
+      case A.CHANGE_SIDE: // "Change side"
         const sides = [{x: this.x, y: fieldHeight * 0.3}, {x: this.x, y: fieldHeight * 0.7}];
         if(this.y > fieldHeight * 0.5){
           if(this.target?.x !== sides[1].x && this.target?.y !== sides[1].y){
@@ -241,7 +243,7 @@ export class Player {
         }
         break;
 
-      default: // case "Stay in my zone":
+      default: // A.STAY_IN_ZONE — "Stay in my zone"
         this.target = { x: this.baseX, y: this.baseY };
         break;
     }
@@ -251,44 +253,44 @@ export class Player {
   evaluateCondition(cond, action, simState) {
     const { ball, teammates, opponents, fieldWidth, fieldHeight } = simState;
 
-    if(["Pass the ball", "Shoot to goal"].includes(action) && !this.hasBall){
+    if([A.PASS, A.SHOOT].includes(action) && !this.hasBall){ // "Pass the ball", "Shoot to goal"
       return false;
     }
-    if(["Go to near rival"].includes(action) && !this.opponentNear){
+    if(action === A.GO_TO_NEAR_RIVAL && !this.opponentNear){ // "Go to near rival"
       return false;
     }
 
     switch (cond) {
-      case "I has the ball":
+      case C.HAS_BALL: // "I has the ball"
         return this.hasBall;
 
-      case "I am marked":
+      case C.AM_MARKED: // "I am marked"
           return this.marked;
 
-      case "I am near a rival":
+      case C.NEAR_RIVAL: // "I am near a rival"
           return this.opponentNear;
 
-      case "The ball is near my goal":
+      case C.BALL_NEAR_MY_GOAL: // "The ball is near my goal"
         return (this.currentFieldSide === "left" && ball.x < fieldWidth * 0.3) ||
                (this.currentFieldSide === "right" && ball.x > fieldWidth * 0.7);
 
-      case "The ball is in my side":       
+      case C.BALL_IN_MY_SIDE: // "The ball is in my side"
         return (this.currentFieldSide === "left" && ball.x < fieldWidth * 0.51) ||
                (this.currentFieldSide === "right" && ball.x > fieldWidth * 0.49);
 
-      case "The ball is in other side":
+      case C.BALL_IN_OTHER_SIDE: // "The ball is in other side"
         return (this.currentFieldSide === "right" && ball.x < fieldWidth * 0.51) ||
                (this.currentFieldSide === "left" && ball.x > fieldWidth * 0.49);
 
-      case "The ball is near rival goal":       
+      case C.BALL_NEAR_RIVAL_GOAL: // "The ball is near rival goal"
         return (this.currentFieldSide === "right" && ball.x < fieldWidth * 0.3) ||
                (this.currentFieldSide === "left" && ball.x > fieldWidth * 0.7);
-         
-      case "Rival in my side":       
+
+      case C.RIVAL_IN_MY_SIDE: // "Rival in my side"
         return (this.currentFieldSide === "left" && !opponents.every(p => p.x > fieldWidth * 0.49)) ||
                (this.currentFieldSide === "right" && !opponents.every(p => p.x < fieldWidth * 0.51));
-         
-      case "No rival in my side":       
+
+      case C.NO_RIVAL_IN_MY_SIDE: // "No rival in my side"
         return (this.currentFieldSide === "left" && opponents.every(p => p.x > fieldWidth * 0.49)) ||
                (this.currentFieldSide === "right" && opponents.every(p => p.x < fieldWidth * 0.51));
          

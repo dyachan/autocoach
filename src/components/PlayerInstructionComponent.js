@@ -35,19 +35,19 @@ export class PlayerInstructionComponent {
     this.hasBallContainer[value ? 1 : 0].querySelector(".defaultaction").classList.remove("active");
   }
 
-  setCurrentRule(ruleString){
+  setCurrentRule(ruleId){
     let containerIndex = this.myTeamHasBall ? 0 : 1;
-    
+
     this.hasBallContainer[containerIndex].querySelectorAll(".rule-item").forEach(rule => {
       const condSelect = rule.querySelector(".rule-condition");
-      if (condSelect.value === ruleString) {
+      if (Number(condSelect.value) === ruleId) { // ruleId is an int from backend
         rule.classList.add("active");
       } else {
         rule.classList.remove("active");
       }
     });
 
-    if(ruleString == "Default"){
+    if(ruleId === null){ // null → no rule matched, default action is active
       this.hasBallContainer[containerIndex].querySelector(".defaultaction").classList.add("active");
     } else {
       this.hasBallContainer[containerIndex].querySelector(".defaultaction").classList.remove("active");
@@ -78,7 +78,7 @@ export class PlayerInstructionComponent {
     
     // set default action
     container.querySelectorAll(".defaultaction").forEach( (element) => {
-      element.textContent = this.actions[0];
+      element.textContent = this.actions[0].label; // A.STAY_IN_ZONE
     });
 
     // Compute total budget
@@ -177,15 +177,17 @@ export class PlayerInstructionComponent {
     const btnDown = ruleEl.querySelector(".btn-down");
     const btnDelete = ruleEl.querySelector(".btn-delete");
 
-    // Fill selects
+    // Fill selects — value = numeric ID, label = human-readable string
     this.conditions.forEach((c) => {
       const opt = document.createElement("option");
-      opt.textContent = c;
+      opt.value = c.id;
+      opt.textContent = c.label;
       selectCond.appendChild(opt);
     });
     this.actions.forEach((a) => {
       const opt = document.createElement("option");
-      opt.textContent = a;
+      opt.value = a.id;
+      opt.textContent = a.label;
       selectAct.appendChild(opt);
     });
 
@@ -236,8 +238,8 @@ export class PlayerInstructionComponent {
     const rules = [[], []];
     this.rulesContainer.forEach((container, index) => {
       container.querySelectorAll(".rule-item").forEach((el) => {
-        const cond = el.querySelector(".rule-condition").value;
-        const act = el.querySelector(".rule-action").value;
+        const cond = Number(el.querySelector(".rule-condition").value); // int ID
+        const act = Number(el.querySelector(".rule-action").value);     // int ID
         rules[index].push({ condition: cond, action: act });
       });
     });
