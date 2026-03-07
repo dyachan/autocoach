@@ -163,9 +163,25 @@ export class TeamFormationComponent {
 
   selectTeam() {
     const name = this.root.querySelector(".team-selection").value;
-    for(let formation of this.formations){
-      if(formation.name == name){
-        this.loadTeamData(JSON.parse(formation.formation));
+    for (let formation of this.formations) {
+      if (formation.name == name) {
+        const teamData = {
+          players: formation.configuration.map(p => ({
+            name:            p.name,
+            rules:           [p.rules_with_ball || [], p.rules_without_ball || []],
+            defaultZone:     { x: p.default_zone_x, y: p.default_zone_y },
+            maxSpeed:        p.max_speed,
+            accuracy:        p.accuracy,
+            control:         p.control,
+            reaction:        p.reaction,
+            dribble:         p.dribble,
+            strength:        p.strength,
+            endurance:       p.endurance,
+            scanWithBall:    p.scan_with_ball,
+            scanWithoutBall: p.scan_without_ball,
+          }))
+        };
+        this.loadTeamData(teamData);
         this.root.querySelector(".team-name").value = formation.name;
         break;
       }
@@ -199,19 +215,42 @@ export class TeamFormationComponent {
       this.root.querySelector(".team-message").textContent = "Uploading";
       this.root.querySelector(".team-message").style.display = null;
       this.root.querySelector(".btn-upload-team").disabled = true;
+      const configuration = this.players.map(p => {
+        const stats = p.getStats();
+        const rules = p.getRules();
+        const zone  = p.getDefaultZoneValues();
+        return {
+          name:               p.playerName,
+          default_zone_x:     parseFloat(zone.x),
+          default_zone_y:     parseFloat(zone.y),
+          max_speed:          stats.maxSpeed,
+          accuracy:           stats.accuracy,
+          control:            stats.control,
+          reaction:           stats.reaction,
+          dribble:            stats.dribble,
+          strength:           stats.strength,
+          endurance:          stats.endurance,
+          scan_with_ball:     stats.scanWithBall    ?? null,
+          scan_without_ball:  stats.scanWithoutBall ?? null,
+          rules_with_ball:    rules[0],
+          rules_without_ball: rules[1],
+        };
+      });
+
       fetch(CONSTANTS.server_url+"storeteam", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: this.getTeamName(), formation: JSON.stringify(this.getTeamData()) })
+        body: JSON.stringify({ name: this.getTeamName(), configuration })
       }).then( (response) => {
         return response.json();
       }).then( (response) => {
-        if(response.success){
+        if (response.data) {
           this.root.querySelector(".team-message").textContent = "Uploaded :)";
           this.root.querySelector(".team-message").style.display = null;
           document.updateTeams();
         } else {
-          this.root.querySelector(".team-message").textContent = response.error + " :(";
+          const error = response.message || Object.values(response.errors || {})[0]?.[0] || "Error";
+          this.root.querySelector(".team-message").textContent = error + " :(";
           this.root.querySelector(".team-message").style.display = null;
         }
         this.root.querySelector(".btn-upload-team").disabled = false;

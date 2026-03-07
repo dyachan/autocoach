@@ -97,43 +97,23 @@ export class RenderComponent {
   update(instant) {
     this.renderField();
 
-    // players
-    this.renderPlayer( 
-      instant["teamA"]["goalkeeper"]["x"], this.height-instant["teamA"]["goalkeeper"]["y"], 
-      "#fd9946",
-      Math.max(instant["teamA"]["goalkeeper"]["ballCooldown"], instant["teamA"]["goalkeeper"]["bodyCooldown"]),
-      instant["teamA"]["goalkeeper"]["marked"], "Goalkeeper");
-    this.renderPlayer( 
-      instant["teamA"]["defender"]["x"], this.height-instant["teamA"]["defender"]["y"], 
-      "#fd9946",
-      Math.max(instant["teamA"]["defender"]["ballCooldown"], instant["teamA"]["defender"]["bodyCooldown"]),
-      instant["teamA"]["defender"]["marked"], "Defender");
-    this.renderPlayer( 
-      instant["teamA"]["striker"]["x"], this.height-instant["teamA"]["striker"]["y"], 
-      "#fd9946",
-      Math.max(instant["teamA"]["striker"]["ballCooldown"], instant["teamA"]["striker"]["bodyCooldown"]),
-      instant["teamA"]["striker"]["marked"], "Striker");
-
-    this.renderPlayer( 
-      instant["teamB"]["goalkeeper"]["x"], this.height-instant["teamB"]["goalkeeper"]["y"], 
-      "#b676ff",
-      Math.max(instant["teamB"]["goalkeeper"]["ballCooldown"], instant["teamB"]["goalkeeper"]["bodyCooldown"]),
-      instant["teamB"]["goalkeeper"]["marked"], "Goalkeeper");
-    this.renderPlayer( 
-      instant["teamB"]["defender"]["x"], this.height-instant["teamB"]["defender"]["y"], 
-      "#b676ff",
-      Math.max(instant["teamB"]["defender"]["ballCooldown"], instant["teamB"]["defender"]["bodyCooldown"]),
-      instant["teamB"]["defender"]["marked"], "Defender");
-    this.renderPlayer( 
-      instant["teamB"]["striker"]["x"], this.height-instant["teamB"]["striker"]["y"], 
-      "#b676ff",
-      Math.max(instant["teamB"]["striker"]["ballCooldown"], instant["teamB"]["striker"]["bodyCooldown"]),
-      instant["teamB"]["striker"]["marked"], "Striker");
+    const teamColors = ["#fd9946", "#b676ff"];
+    ["teamA", "teamB"].forEach((team, i) => {
+      instant[team].forEach(p => {
+        this.renderPlayer(
+          p.x, this.height - p.y,
+          teamColors[i],
+          Math.max(p.ballCooldown, p.bodyCooldown),
+          p.marked,
+          p.name
+        );
+      });
+    });
 
     // ball
     this.ctx.beginPath();
     this.ctx.fillStyle = "#fff";
-    this.ctx.arc(instant["ball"]["x"], this.height-instant["ball"]["y"], this.PLAYER_SIZE*0.2, 0, Math.PI * 2);
+    this.ctx.arc(instant["ball"]["x"], this.height - instant["ball"]["y"], this.PLAYER_SIZE * 0.2, 0, Math.PI * 2);
     this.ctx.fill();
   }
 }

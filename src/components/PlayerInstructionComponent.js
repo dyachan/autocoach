@@ -89,10 +89,10 @@ export class PlayerInstructionComponent {
     this.updateStatsDisplay();
     this.setDefaultZoneValues();
     this.root.querySelector(".defaultzonex").addEventListener("change", () => {
-      document.updatePlayersDefaultPosition();
+      this.triggerUpdate();
     })
     this.root.querySelector(".defaultzoney").addEventListener("change", () => {
-      document.updatePlayersDefaultPosition();
+      this.triggerUpdate();
     })
 
     // Toggle stats panel visibility

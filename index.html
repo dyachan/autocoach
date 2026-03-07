@@ -44,19 +44,6 @@
   <!-- Templates Section -->
   <!-- ============================= -->
 
-  <script>
-    function toggleTeam(){
-      document.querySelectorAll(".team-formation").forEach( (tf) => {
-        if(tf.style.display === "none"){
-          tf.style.display = null;
-        } else {
-          tf.style.display = "none";
-        }
-        document.updatePlayersDefaultPosition();
-      });
-    }
-  </script>
-
   <!-- Team Formation Template -->
   <template id="tpl-team-formation">
     <div class="team-formation">
@@ -74,7 +61,7 @@
           <select class="team-selection"></select>
           <button class="btn-select-team">Select Team <span class="loader"></span> </button>
           <div style="flex-grow: 2;"></div>
-          <button class="btn-change-team" onclick="toggleTeam()">Other team</button>
+          <button class="btn-change-team">Other team</button>
         </label>
         <label style="justify-content: space-between; display: none;">
           <button class="btn-export-team">Export Team</button>
