@@ -74,7 +74,8 @@ export class PlayerInstructionComponent {
       const container = this.rulesContainer[index];
       btn.addEventListener("click", () => {
         container.appendChild(this.createRule());
-        this.updateUpAndDownDisabled(container)
+        this.updateUpAndDownDisabled(container);
+        this._updateAddRuleButtons();
       });
     });
     
@@ -111,7 +112,7 @@ export class PlayerInstructionComponent {
         const allInputs = Array.from(this.root.querySelectorAll(".stat-input"));
         const sum = allInputs.reduce((acc, i) => acc + parseFloat(i.value), 0);
         if (sum > this.maxTotal) {
-          input.value = Math.max(0, Math.round((parseFloat(input.value) - (sum - this.maxTotal)) * 100) / 100);
+          input.value = Math.max(parseFloat(input.min || 0), Math.round((parseFloat(input.value) - (sum - this.maxTotal)) * 100) / 100);
         }
         input.closest("label").querySelector("output").value = parseFloat(input.value).toFixed(2);
         this.updateStatsDisplay();
@@ -208,6 +209,7 @@ export class PlayerInstructionComponent {
       const container = ruleEl.closest(".rules-container")
       ruleEl.remove();
       this.updateUpAndDownDisabled(container);
+      this._updateAddRuleButtons();
       this.triggerUpdate();
     });
 
@@ -262,6 +264,7 @@ export class PlayerInstructionComponent {
       });
       this.updateUpAndDownDisabled(this.rulesContainer[i]);
     });
+    this._updateAddRuleButtons();
   }
 
   /** Triggers the external update callback */
@@ -283,6 +286,63 @@ export class PlayerInstructionComponent {
 
       // disable / enable down
       btnDown.disabled = index === items.length - 1;
+    });
+  }
+
+  // ── Roguelike methods ────────────────────────────────────────────
+
+  /**
+   * Sets all stats to 0.1 and locks them (used at the start of a roguelike run,
+   * before the first match, when no budget is available yet).
+   */
+  initRoguelikeStats() {
+    const initVal = 0.1;
+    const statInputs = this.root.querySelectorAll('.stat-input');
+    statInputs.forEach(input => {
+      input.value = initVal;
+      input.closest('label').querySelector('output').value = initVal.toFixed(2);
+    });
+    this.maxTotal = Math.round(statInputs.length * initVal * 100) / 100;
+    this.updateStatsDisplay();
+    this.lockCurrentStats();
+  }
+
+  /** Disables the "+ Add Rule" button once the container reaches n rules. */
+  setMaxRules(n) {
+    this._maxRules = n;
+    this._updateAddRuleButtons();
+  }
+
+  /** Freezes current stat values as the minimum floor for future turns. */
+  lockCurrentStats() {
+    this._lockedStats = {};
+    this.root.querySelectorAll('.stat-input').forEach(input => {
+      this._lockedStats[input.dataset.stat] = parseFloat(input.value);
+      input.min = input.value;
+      input.disabled = true;
+    });
+  }
+
+  /**
+   * Re-enables stat sliders with a new budget of `delta` points on top of the
+   * locked floor. The total cap becomes locked_total + delta.
+   */
+  enableDeltaBudget(delta) {
+    const lockedTotal = Object.values(this._lockedStats || {}).reduce((a, b) => a + b, 0);
+    this.maxTotal = Math.round((lockedTotal + delta) * 100) / 100;
+    this.root.querySelectorAll('.stat-input').forEach(input => {
+      input.disabled = false;
+      input.min = this._lockedStats?.[input.dataset.stat] ?? 0;
+    });
+    this.updateStatsDisplay();
+  }
+
+  /** Keeps "+ Add Rule" buttons in sync with the current _maxRules limit. */
+  _updateAddRuleButtons() {
+    if (this._maxRules === undefined) return;
+    this.rulesContainer.forEach(container => {
+      const addBtn = container.closest('article')?.querySelector('.btn-add-rule');
+      if (addBtn) addBtn.disabled = container.querySelectorAll('.rule-item').length >= this._maxRules;
     });
   }
 }

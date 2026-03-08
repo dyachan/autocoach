@@ -61,6 +61,22 @@ export const es = {
   takeoff_balls: "Pelotas arrebatadas (robadas): ",
   dribbled_balls: "Regates Exitosos - Fallidos: ",
 
+  // Roguelike
+  rogue_mode_btn: "Roguelike",
+  sim_mode_btn: "Simulación",
+  rogue_turn: "Turno",
+  rogue_max_rules: "Reglas máx",
+  rogue_play_btn: "Jugar turno",
+  rogue_create_btn: "Crear equipo e iniciar",
+  rogue_next_btn: "Siguiente turno",
+  rogue_reset_btn: "Nueva partida",
+  rogue_game_over: "FIN DEL JUEGO",
+  rogue_distribute: "Distribuye 0.5 stats por jugador, luego:",
+  rogue_result_win: "Victoria",
+  rogue_result_loss: "Derrota",
+  rogue_result_draw: "Empate",
+  rogue_vs: "vs",
+
   // Roles (solo se muestra la primera letra en el canvas)
   goalkeeper: "Portero",
   defender: "Defensor",

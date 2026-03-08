@@ -61,6 +61,22 @@ export const en = {
   takeoff_balls: "Take off balls (stealed): ",
   dribbled_balls: "Dribbled balls Successful - Failed: ",
 
+  // Roguelike
+  rogue_mode_btn: "Roguelike",
+  sim_mode_btn: "Simulation",
+  rogue_turn: "Turn",
+  rogue_max_rules: "Max rules",
+  rogue_play_btn: "Play turn",
+  rogue_create_btn: "Create team & start",
+  rogue_next_btn: "Next turn",
+  rogue_reset_btn: "New run",
+  rogue_game_over: "GAME OVER",
+  rogue_distribute: "Distribute 0.5 stats per player, then:",
+  rogue_result_win: "Victory",
+  rogue_result_loss: "Defeat",
+  rogue_result_draw: "Draw",
+  rogue_vs: "vs",
+
   // Roles (only first letter shown on canvas)
   goalkeeper: "Goalkeeper",
   defender: "Defender",

@@ -267,6 +267,30 @@ export class TeamFormationComponent {
     }
   }
 
+  // ── Roguelike methods ────────────────────────────────────────────
+
+  /** Hides team-management controls and limits rules per section. */
+  setRoguelikeMode(maxRules) {
+    this.root.querySelector('.btn-upload-team').style.display = 'none';
+    this.root.querySelector('.btn-select-team').closest('label').style.display = 'none';
+    this.root.querySelector('.btn-export-team').closest('label').style.display = 'none';
+    this.root.querySelector('.btn-change-team').style.display = 'none';
+    this.players.forEach(p => p.setMaxRules(maxRules));
+  }
+
+  /** Updates the max-rules limit without recreating any component. */
+  updateRoguelikeRules(maxRules) {
+    this.players.forEach(p => p.setMaxRules(maxRules));
+  }
+
+  /** Locks current stats and opens a new delta budget for the next turn. */
+  startNewTurnDistribution(delta = 0.5) {
+    this.players.forEach(p => {
+      p.lockCurrentStats();
+      p.enableDeltaBudget(delta);
+    });
+  }
+
   setFormations(formations) {
     this.formations = formations;
     const selectDom = this.root.querySelector(".team-selection");

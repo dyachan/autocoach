@@ -61,6 +61,22 @@ export const fr = {
   takeoff_balls: "Ballons récupérés (volés) : ",
   dribbled_balls: "Dribbles Réussis - Ratés : ",
 
+  // Roguelike
+  rogue_mode_btn: "Roguelike",
+  sim_mode_btn: "Simulation",
+  rogue_turn: "Tour",
+  rogue_max_rules: "Règles max",
+  rogue_play_btn: "Jouer le tour",
+  rogue_create_btn: "Créer l'équipe et démarrer",
+  rogue_next_btn: "Tour suivant",
+  rogue_reset_btn: "Nouvelle partie",
+  rogue_game_over: "FIN DE PARTIE",
+  rogue_distribute: "Distribue 0.5 stats par joueur, puis :",
+  rogue_result_win: "Victoire",
+  rogue_result_loss: "Défaite",
+  rogue_result_draw: "Match nul",
+  rogue_vs: "vs",
+
   // Rôles (seule la première lettre s'affiche sur le canvas)
   goalkeeper: "Gardien",
   defender: "Défenseur",
