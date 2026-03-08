@@ -5,13 +5,14 @@ import { SummaryRenderer } from "./SummaryRenderer.js";
 import { MatchPlayer } from "./MatchPlayer.js";
 import { CONSTANTS } from "./Constants.js";
 import { CONDITIONS, ACTIONS } from "./PlayerRules.js";
+import { t, getLang, setLocale, applyTranslations } from "./i18n.js";
 
 const conditions = CONDITIONS;
 const actions = ACTIONS;
 
 // --- Field preview ---
 const render = new RenderComponent();
-const ROLES = ["Goalkeeper", "Defender", "Striker"];
+const ROLE_KEYS = ['goalkeeper', 'defender', 'striker'];
 
 function updateFieldPreview() {
   if (!matchPlayer.canPreview) return;
@@ -29,7 +30,7 @@ function updateFieldPreview() {
     const y = teamBVisible
       ? render.height - render.height * (100 - player.defaultZone.y) / 100
       : render.height - render.height * player.defaultZone.y / 100;
-    render.renderPlayer(x, y, color, 0, false, ROLES[i]);
+    render.renderPlayer(x, y, color, 0, false, t(ROLE_KEYS[i]));
   });
 }
 
@@ -123,3 +124,10 @@ function updateTeams() {
 updateTeams().then(() => {
   loadBtn.disabled = false;
 });
+
+// --- i18n ---
+applyTranslations();
+
+const langSwitcher = document.getElementById("lang-switcher");
+langSwitcher.value = getLang();
+langSwitcher.addEventListener("change", (e) => setLocale(e.target.value));

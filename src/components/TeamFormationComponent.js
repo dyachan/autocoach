@@ -1,5 +1,6 @@
 import { PlayerInstructionComponent } from "./PlayerInstructionComponent.js";
 import { CONSTANTS } from "../Constants.js";
+import { t } from '../i18n.js';
 
 export class TeamFormationComponent {
   constructor(teamName, conditions, actions, onUpdate) {
@@ -190,9 +191,9 @@ export class TeamFormationComponent {
 
   uploadTeam() {
     const messages = [
-      "Upload this team?",
-      "database is limited ...",
-      "sure? sure? sure?",
+      t('upload_confirm_1'),
+      t('upload_confirm_2'),
+      t('upload_confirm_3'),
     ];
     
     if(this.currentUploadClick < messages.length){ // before upload
@@ -212,7 +213,7 @@ export class TeamFormationComponent {
       clearTimeout(this.currentUploadTimeout);
       this.currentUploadTimeout = null;
       this.currentUploadClick = 0;
-      this.root.querySelector(".team-message").textContent = "Uploading";
+      this.root.querySelector(".team-message").textContent = t('uploading');
       this.root.querySelector(".team-message").style.display = null;
       this.root.querySelector(".btn-upload-team").disabled = true;
       const configuration = this.players.map(p => {
@@ -245,11 +246,11 @@ export class TeamFormationComponent {
         return response.json();
       }).then( (response) => {
         if (response.data) {
-          this.root.querySelector(".team-message").textContent = "Uploaded :)";
+          this.root.querySelector(".team-message").textContent = t('uploaded_success');
           this.root.querySelector(".team-message").style.display = null;
           document.updateTeams();
         } else {
-          const error = response.message || Object.values(response.errors || {})[0]?.[0] || "Error";
+          const error = response.message || Object.values(response.errors || {})[0]?.[0] || t('error');
           this.root.querySelector(".team-message").textContent = error + " :(";
           this.root.querySelector(".team-message").style.display = null;
         }

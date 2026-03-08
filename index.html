@@ -10,14 +10,19 @@
   <header id="editorPanel">
     <button id="hidecontrolsbtn"></button>
   </header>
-  
+
   <main>
     <section class="matchpanel">
       <article class="matchcontrols">
-        <button id="btn-init-match" disabled>Simulate<span class="loader"></span> </button>
+        <select id="lang-switcher">
+          <option value="en">EN</option>
+          <option value="es">ES</option>
+          <option value="fr">FR</option>
+        </select>
+        <button id="btn-init-match" disabled><span data-i18n="simulate">Simulate</span><span class="loader"></span></button>
         <span id="matchpercent">0</span><span>%</span>
-        <button id="restartbutton" disabled style="display: none;">Restart</button>
-        <button id="pausebutton" disabled>Pause</button>
+        <button id="restartbutton" disabled style="display: none;" data-i18n="restart">Restart</button>
+        <button id="pausebutton" disabled data-i18n="pause">Pause</button>
       </article>
       <canvas id="gameCanvas"></canvas>
       <article>
@@ -31,10 +36,10 @@
     <section class="matchpanel">
       <article class="matchinfo">
         <label>
-          <span>Ball: </span><span id="ballteam"></span>
+          <span data-i18n="ball_label">Ball:</span><span id="ballteam"></span>
         </label>
         <fieldset id="log">
-          <legend>Log:</legend>
+          <legend data-i18n="log_label">Log:</legend>
         </fieldset>
       </article>
     </section>
@@ -49,24 +54,24 @@
     <div class="team-formation">
       <div class="team-controls">
         <label>
-          <p>Name</p>
+          <p data-i18n="name_label">Name</p>
           <input class="team-name"></input>
           <div style="flex-grow: 2;"></div>
           <button class="btn-upload-team">
             <span class="team-message" style="display: none;"></span>
-            Upload Team
+            <span data-i18n="upload_team">Upload Team</span>
           </button>
         </label>
         <label>
           <select class="team-selection"></select>
-          <button class="btn-select-team">Select Team <span class="loader"></span> </button>
+          <button class="btn-select-team"><span data-i18n="select_team">Select Team</span> <span class="loader"></span></button>
           <div style="flex-grow: 2;"></div>
-          <button class="btn-change-team">Other team</button>
+          <button class="btn-change-team" data-i18n="other_team">Other team</button>
         </label>
         <label style="justify-content: space-between; display: none;">
-          <button class="btn-export-team">Export Team</button>
+          <button class="btn-export-team" data-i18n="export_team">Export Team</button>
           <input class="import-area"></input>
-          <button class="btn-import-team">Import Team</button>
+          <button class="btn-import-team" data-i18n="import_team">Import Team</button>
         </label>
       </div>
       <div class="players-wrapper"></div>
@@ -81,7 +86,7 @@
           <span class="player-name">Player</span>
         </label>
         <label>
-          <span class="reservedword">DEFAULT ZONE</span>
+          <span class="reservedword" data-i18n="default_zone">DEFAULT ZONE</span>
           <input class="defaultzonex" type="number" min="0" max="100"></input>
           <span class="reservedword">%</span>
           <input class="defaultzoney" type="number" min="0" max="100"></input>
@@ -91,83 +96,83 @@
 
       <section>
           <article class="myteamhasball">
-            <span class="reservedword">WHILE </span><span class="fixed"> Team has ball </span>
-            <button class="btn-add-rule">+ Add Rule</button>
+            <span class="reservedword" data-i18n="while_keyword">WHILE </span><span class="fixed" data-i18n="team_has_ball"> Team has ball </span>
+            <button class="btn-add-rule" data-i18n="add_rule">+ Add Rule</button>
             <hr>
             <div class="rules-container"></div>
-            <span class="reservedword">DEFAULT </span><span class="defaultaction fixed"></span>
+            <span class="reservedword" data-i18n="default_keyword">DEFAULT </span><span class="defaultaction fixed"></span>
           </article>
           <article class="myteamdonthasball">
-            <span class="reservedword">ELSE</span>
-            <button class="btn-add-rule">+ Add Rule</button>
+            <span class="reservedword" data-i18n="else_keyword">ELSE</span>
+            <button class="btn-add-rule" data-i18n="add_rule">+ Add Rule</button>
             <hr>
             <div class="rules-container"></div>
-            <span class="reservedword">DEFAULT </span><span class="defaultaction fixed"></span>
+            <span class="reservedword" data-i18n="default_keyword">DEFAULT </span><span class="defaultaction fixed"></span>
           </article>
       </section>
 
-      <button class="btn-stats">stats</button>
+      <button class="btn-stats" data-i18n="stats_button">stats</button>
       <section class="player-stats-container">
         <article class="player-stats-grid">
           <label>
             <span class="stat-header">
-              <span class="reservedword">Scan w/ ball</span>
+              <span class="reservedword" data-i18n="scan_with_ball">Scan w/ ball</span>
               <output>0.5</output>
             </span>
             <input class="stat-input" data-stat="scanWithBall" type="range" min="0" max="1" step="0.01" value="0.5">
           </label>
           <label>
             <span class="stat-header">
-              <span class="reservedword">Scan w/o ball</span>
+              <span class="reservedword" data-i18n="scan_without_ball">Scan w/o ball</span>
               <output>0.5</output>
             </span>
             <input class="stat-input" data-stat="scanWithoutBall" type="range" min="0" max="1" step="0.01" value="0.5">
           </label>
           <label>
             <span class="stat-header">
-              <span class="reservedword">Max speed</span>
+              <span class="reservedword" data-i18n="max_speed">Max speed</span>
               <output>0.5</output>
             </span>
             <input class="stat-input" data-stat="maxSpeed" type="range" min="0" max="1" step="0.01" value="0.5">
           </label>
           <label>
             <span class="stat-header">
-              <span class="reservedword">Accuracy</span>
+              <span class="reservedword" data-i18n="accuracy">Accuracy</span>
               <output>0.5</output>
             </span>
             <input class="stat-input" data-stat="accuracy" type="range" min="0" max="1" step="0.01" value="0.5">
           </label>
           <label>
             <span class="stat-header">
-              <span class="reservedword">Control</span>
+              <span class="reservedword" data-i18n="control">Control</span>
               <output>0.5</output>
             </span>
             <input class="stat-input" data-stat="control" type="range" min="0" max="1" step="0.01" value="0.5">
           </label>
           <label>
             <span class="stat-header">
-              <span class="reservedword">Reaction</span>
+              <span class="reservedword" data-i18n="reaction">Reaction</span>
               <output>0.5</output>
             </span>
             <input class="stat-input" data-stat="reaction" type="range" min="0" max="1" step="0.01" value="0.5">
           </label>
           <label>
             <span class="stat-header">
-              <span class="reservedword">Dribble</span>
+              <span class="reservedword" data-i18n="dribble">Dribble</span>
               <output>0.5</output>
             </span>
             <input class="stat-input" data-stat="dribble" type="range" min="0" max="1" step="0.01" value="0.5">
           </label>
           <label>
             <span class="stat-header">
-              <span class="reservedword">Strength</span>
+              <span class="reservedword" data-i18n="strength">Strength</span>
               <output>0.5</output>
             </span>
             <input class="stat-input" data-stat="strength" type="range" min="0" max="1" step="0.01" value="0.5">
           </label>
           <label>
             <span class="stat-header">
-              <span class="reservedword">Endurance</span>
+              <span class="reservedword" data-i18n="endurance">Endurance</span>
               <output>0.5</output>
             </span>
             <input class="stat-input" data-stat="endurance" type="range" min="0" max="1" step="0.01" value="0.5">
@@ -182,11 +187,11 @@
   <template id="tpl-rule-item">
     <div class="rule-item">
       <button class="btn-up">▲</button>
-      <span class="reservedword">IF</span>
+      <span class="reservedword" data-i18n="if_keyword">IF</span>
       <select class="rule-condition"></select>
       <br />
       <button class="btn-down">▼</button>
-      <span class="reservedword">THEN</span>
+      <span class="reservedword" data-i18n="then_keyword">THEN</span>
       <select class="rule-action"></select>
       <button class="btn-delete warning">✖</button>
     </div>
@@ -205,12 +210,12 @@
   <!-- Team Summary Template -->
   <template id="tpl-team-summary-item">
     <fieldset class="team-summary-item">
-      <legend>Team</legend>
+      <legend data-i18n="team_label">Team</legend>
       <label>
-        <span class="summary-possession-label summary-label">Possession: </span>
+        <span class="summary-possession-label summary-label" data-i18n="possession_label">Possession: </span>
         <span class="summary-possession-value">0 %</span>
         <div style="flex-grow: 2;"></div>
-        <span class="summary-goals-label summary-label">Goals: </span>
+        <span class="summary-goals-label summary-label" data-i18n="goals_label">Goals: </span>
         <span class="summary-goals-value">0 %</span>
       </label>
     </fieldset>
@@ -222,42 +227,42 @@
       <span class="summary-name">Player</span>
 
       <label>
-        <span class="summary-distance-label summary-label">Distance traveled (with ball): </span>
+        <span class="summary-distance-label summary-label" data-i18n="distance_traveled">Distance traveled (with ball): </span>
         <span class="summary-distance-value">0 (0)</span>
       </label>
 
       <label>
-        <span class="summary-marked-label summary-label">Time marked Team has ball Yes - No: </span>
+        <span class="summary-marked-label summary-label" data-i18n="time_marked">Time marked Team has ball Yes - No: </span>
         <span class="summary-marked-value">0% - 0%</span>
       </label>
 
       <label>
-        <span class="summary-control-label summary-label">Ball Controled - Intercepted: </span>
+        <span class="summary-control-label summary-label" data-i18n="ball_controlled">Ball Controled - Intercepted: </span>
         <span class="summary-control-value">0 - 0</span>
       </label>
 
       <label>
-        <span class="summary-pass-label summary-label">Passes made (achieved): </span>
+        <span class="summary-pass-label summary-label" data-i18n="passes_made">Passes made (achieved): </span>
         <span class="summary-pass-value">0 (0)</span>
       </label>
 
       <label>
-        <span class="summary-shoot-label summary-label">Shoots made (goals): </span>
+        <span class="summary-shoot-label summary-label" data-i18n="shoots_made">Shoots made (goals): </span>
         <span class="summary-shoot-value">0 (0)</span>
       </label>
 
       <label>
-        <span class="summary-challenged-label summary-label">Challenged balls I has it - Rival has it: </span>
+        <span class="summary-challenged-label summary-label" data-i18n="challenged_balls">Challenged balls I has it - Rival has it: </span>
         <span class="summary-challenged-value">0 - 0</span>
       </label>
 
       <label>
-        <span class="summary-steal-label summary-label">Take off balls (stealed): </span>
+        <span class="summary-steal-label summary-label" data-i18n="takeoff_balls">Take off balls (stealed): </span>
         <span class="summary-steal-value">0 (0)</span>
       </label>
 
       <label>
-        <span class="summary-dribbled-label summary-label">Dribbled balls Successful - Failed: </span>
+        <span class="summary-dribbled-label summary-label" data-i18n="dribbled_balls">Dribbled balls Successful - Failed: </span>
         <span class="summary-dribbled-value">0 - 0</span>
       </label>
 

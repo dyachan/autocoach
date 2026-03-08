@@ -1,69 +1,71 @@
 /**
  * Numeric identifiers for all player rule conditions and actions.
  * Mirror of app/Services/PlayerRules.php — the backend sends these IDs;
- * the frontend is responsible for mapping them to human-readable labels.
+ * the frontend maps them to i18n keys for human-readable labels.
  */
 
 // Conditions
 export const C = {
-  HAS_BALL:            1,  // "I has the ball"
-  AM_MARKED:           2,  // "I am marked"
-  NEAR_RIVAL:          3,  // "I am near a rival"
-  BALL_NEAR_MY_GOAL:   4,  // "The ball is near my goal"
-  BALL_IN_MY_SIDE:     5,  // "The ball is in my side"
-  BALL_IN_OTHER_SIDE:  6,  // "The ball is in other side"
-  BALL_NEAR_RIVAL_GOAL:7,  // "The ball is near rival goal"
-  RIVAL_IN_MY_SIDE:    8,  // "Rival in my side"
-  NO_RIVAL_IN_MY_SIDE: 9,  // "No rival in my side"
+  HAS_BALL:            1,
+  AM_MARKED:           2,
+  NEAR_RIVAL:          3,
+  BALL_NEAR_MY_GOAL:   4,
+  BALL_IN_MY_SIDE:     5,
+  BALL_IN_OTHER_SIDE:  6,
+  BALL_NEAR_RIVAL_GOAL:7,
+  RIVAL_IN_MY_SIDE:    8,
+  NO_RIVAL_IN_MY_SIDE: 9,
 };
 
 // Actions
 export const A = {
-  STAY_IN_ZONE:     1,   // "Stay in my zone"
-  GO_TO_BALL:       2,   // "Go to the ball"
-  GO_TO_NEAR_RIVAL: 3,   // "Go to near rival"
-  GO_TO_MY_GOAL:    4,   // "Go to my goal"
-  GO_TO_RIVAL_GOAL: 5,   // "Go to rival goal"
-  GO_FORWARD:       6,   // "Go forward"
-  GO_BACK:          7,   // "Go back"
-  PASS:             8,   // "Pass the ball"
-  SHOOT:            9,   // "Shoot to goal"
-  CHANGE_SIDE:      10,  // "Change side"
+  STAY_IN_ZONE:     1,
+  GO_TO_BALL:       2,
+  GO_TO_NEAR_RIVAL: 3,
+  GO_TO_MY_GOAL:    4,
+  GO_TO_RIVAL_GOAL: 5,
+  GO_FORWARD:       6,
+  GO_BACK:          7,
+  PASS:             8,
+  SHOOT:            9,
+  CHANGE_SIDE:      10,
 };
 
-export const CONDITION_LABELS = {
-  [C.HAS_BALL]:            "I has the ball",
-  [C.AM_MARKED]:           "I am marked",
-  [C.NEAR_RIVAL]:          "I am near a rival",
-  [C.BALL_NEAR_MY_GOAL]:   "The ball is near my goal",
-  [C.BALL_IN_MY_SIDE]:     "The ball is in my side",
-  [C.BALL_IN_OTHER_SIDE]:  "The ball is in other side",
-  [C.BALL_NEAR_RIVAL_GOAL]:"The ball is near rival goal",
-  [C.RIVAL_IN_MY_SIDE]:    "Rival in my side",
-  [C.NO_RIVAL_IN_MY_SIDE]: "No rival in my side",
+/** Maps condition id → i18n key */
+export const CONDITION_KEYS = {
+  [C.HAS_BALL]:            'cond_has_ball',
+  [C.AM_MARKED]:           'cond_am_marked',
+  [C.NEAR_RIVAL]:          'cond_near_rival',
+  [C.BALL_NEAR_MY_GOAL]:   'cond_ball_near_my_goal',
+  [C.BALL_IN_MY_SIDE]:     'cond_ball_in_my_side',
+  [C.BALL_IN_OTHER_SIDE]:  'cond_ball_in_other_side',
+  [C.BALL_NEAR_RIVAL_GOAL]:'cond_ball_near_rival_goal',
+  [C.RIVAL_IN_MY_SIDE]:    'cond_rival_in_my_side',
+  [C.NO_RIVAL_IN_MY_SIDE]: 'cond_no_rival_in_my_side',
 };
 
-export const ACTION_LABELS = {
-  [A.STAY_IN_ZONE]:     "Stay in my zone",
-  [A.GO_TO_BALL]:       "Go to the ball",
-  [A.GO_TO_NEAR_RIVAL]: "Go to near rival",
-  [A.GO_TO_MY_GOAL]:    "Go to my goal",
-  [A.GO_TO_RIVAL_GOAL]: "Go to rival goal",
-  [A.GO_FORWARD]:       "Go forward",
-  [A.GO_BACK]:          "Go back",
-  [A.PASS]:             "Pass the ball",
-  [A.SHOOT]:            "Shoot to goal",
-  [A.CHANGE_SIDE]:      "Change side",
+/** Maps action id → i18n key */
+export const ACTION_KEYS = {
+  [A.STAY_IN_ZONE]:     'act_stay_in_zone',
+  [A.GO_TO_BALL]:       'act_go_to_ball',
+  [A.GO_TO_NEAR_RIVAL]: 'act_go_to_near_rival',
+  [A.GO_TO_MY_GOAL]:    'act_go_to_my_goal',
+  [A.GO_TO_RIVAL_GOAL]: 'act_go_to_rival_goal',
+  [A.GO_FORWARD]:       'act_go_forward',
+  [A.GO_BACK]:          'act_go_back',
+  [A.PASS]:             'act_pass',
+  [A.SHOOT]:            'act_shoot',
+  [A.CHANGE_SIDE]:      'act_change_side',
 };
 
-/** Array of { id, label } for conditions — used to populate UI dropdowns */
-export const CONDITIONS = Object.entries(CONDITION_LABELS).map(([id, label]) => ({
+/** Array of { id, key } for conditions — used to populate UI dropdowns */
+export const CONDITIONS = Object.entries(CONDITION_KEYS).map(([id, key]) => ({
   id: Number(id),
-  label,
+  key,
 }));
 
-/** Array of { id, label } for actions — used to populate UI dropdowns */
-export const ACTIONS = Object.entries(ACTION_LABELS).map(([id, label]) => ({
+/** Array of { id, key } for actions — used to populate UI dropdowns */
+export const ACTIONS = Object.entries(ACTION_KEYS).map(([id, key]) => ({
   id: Number(id),
-  label,
+  key,
 }));

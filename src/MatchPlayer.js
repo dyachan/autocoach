@@ -1,3 +1,5 @@
+import { t } from './i18n.js';
+
 const TICK_SPEED_MS = 20;
 
 export class MatchPlayer {
@@ -106,7 +108,7 @@ export class MatchPlayer {
       this.teamA.setMyTeamHasBall(false);
       this.teamB.setMyTeamHasBall(true);
     } else {
-      this.ballTeamEl.textContent = "free";
+      this.ballTeamEl.textContent = t('free_ball');
       this.teamA.setMyTeamHasBall(false);
       this.teamB.setMyTeamHasBall(false);
     }

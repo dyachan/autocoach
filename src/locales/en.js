@@ -1,0 +1,91 @@
+export const en = {
+  // Page
+  page_title: "AutoCoach Prototype",
+
+  // Controls
+  simulate: "Simulate",
+  restart: "Restart",
+  pause: "Pause",
+  ball_label: "Ball:",
+  log_label: "Log:",
+  free_ball: "free",
+
+  // Team Formation
+  name_label: "Name",
+  upload_team: "Upload Team",
+  select_team: "Select Team",
+  other_team: "Other team",
+  export_team: "Export Team",
+  import_team: "Import Team",
+
+  // Upload messages
+  upload_confirm_1: "Upload this team?",
+  upload_confirm_2: "database is limited ...",
+  upload_confirm_3: "sure? sure? sure?",
+  uploading: "Uploading",
+  uploaded_success: "Uploaded :)",
+  error: "Error",
+
+  // Player Instructions
+  default_zone: "DEFAULT ZONE",
+  while_keyword: "WHILE",
+  team_has_ball: "Team has ball",
+  add_rule: "+ Add Rule",
+  default_keyword: "DEFAULT",
+  else_keyword: "ELSE",
+  stats_button: "stats",
+  if_keyword: "IF",
+  then_keyword: "THEN",
+
+  // Stats
+  scan_with_ball: "Scan w/ ball",
+  scan_without_ball: "Scan w/o ball",
+  max_speed: "Max speed",
+  accuracy: "Accuracy",
+  control: "Control",
+  reaction: "Reaction",
+  dribble: "Dribble",
+  strength: "Strength",
+  endurance: "Endurance",
+
+  // Summary
+  team_label: "Team",
+  possession_label: "Possession: ",
+  goals_label: "Goals: ",
+  distance_traveled: "Distance traveled (with ball): ",
+  time_marked: "Time marked Team has ball Yes - No: ",
+  ball_controlled: "Ball Controled - Intercepted: ",
+  passes_made: "Passes made (achieved): ",
+  shoots_made: "Shoots made (goals): ",
+  challenged_balls: "Challenged balls I has it - Rival has it: ",
+  takeoff_balls: "Take off balls (stealed): ",
+  dribbled_balls: "Dribbled balls Successful - Failed: ",
+
+  // Roles (only first letter shown on canvas)
+  goalkeeper: "Goalkeeper",
+  defender: "Defender",
+  striker: "Striker",
+
+  // Conditions
+  cond_has_ball: "I has the ball",
+  cond_am_marked: "I am marked",
+  cond_near_rival: "I am near a rival",
+  cond_ball_near_my_goal: "The ball is near my goal",
+  cond_ball_in_my_side: "The ball is in my side",
+  cond_ball_in_other_side: "The ball is in other side",
+  cond_ball_near_rival_goal: "The ball is near rival goal",
+  cond_rival_in_my_side: "Rival in my side",
+  cond_no_rival_in_my_side: "No rival in my side",
+
+  // Actions
+  act_stay_in_zone: "Stay in my zone",
+  act_go_to_ball: "Go to the ball",
+  act_go_to_near_rival: "Go to near rival",
+  act_go_to_my_goal: "Go to my goal",
+  act_go_to_rival_goal: "Go to rival goal",
+  act_go_forward: "Go forward",
+  act_go_back: "Go back",
+  act_pass: "Pass the ball",
+  act_shoot: "Shoot to goal",
+  act_change_side: "Change side",
+};

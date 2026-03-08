@@ -1,3 +1,5 @@
+import { t } from '../i18n.js';
+
 export class PlayerInstructionComponent {
   constructor(playerName, conditions, actions, defaultZone, onUpdate) {
     this.playerName = playerName;
@@ -78,7 +80,8 @@ export class PlayerInstructionComponent {
     
     // set default action
     container.querySelectorAll(".defaultaction").forEach( (element) => {
-      element.textContent = this.actions[0].label; // A.STAY_IN_ZONE
+      element.dataset.i18n = this.actions[0].key; // A.STAY_IN_ZONE
+      element.textContent = t(this.actions[0].key);
     });
 
     // Compute total budget
@@ -177,17 +180,19 @@ export class PlayerInstructionComponent {
     const btnDown = ruleEl.querySelector(".btn-down");
     const btnDelete = ruleEl.querySelector(".btn-delete");
 
-    // Fill selects — value = numeric ID, label = human-readable string
+    // Fill selects — value = numeric ID, text = translated label via i18n key
     this.conditions.forEach((c) => {
       const opt = document.createElement("option");
       opt.value = c.id;
-      opt.textContent = c.label;
+      opt.dataset.i18n = c.key;
+      opt.textContent = t(c.key);
       selectCond.appendChild(opt);
     });
     this.actions.forEach((a) => {
       const opt = document.createElement("option");
       opt.value = a.id;
-      opt.textContent = a.label;
+      opt.dataset.i18n = a.key;
+      opt.textContent = t(a.key);
       selectAct.appendChild(opt);
     });
 
