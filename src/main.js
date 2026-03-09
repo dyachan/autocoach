@@ -85,6 +85,13 @@ document.getElementById("restartbutton").addEventListener("click", () => {
   matchPlayer.setTick(0);
 });
 
+const fastForwardBtn = document.getElementById("btn-fast-forward");
+fastForwardBtn.addEventListener("mousedown",   () => { matchPlayer.ticksPerFrame = 15; });
+fastForwardBtn.addEventListener("touchstart",  () => { matchPlayer.ticksPerFrame = 15; }, { passive: true });
+fastForwardBtn.addEventListener("mouseup",     () => { matchPlayer.ticksPerFrame = 1; });
+fastForwardBtn.addEventListener("mouseleave",  () => { matchPlayer.ticksPerFrame = 1; });
+fastForwardBtn.addEventListener("touchend",    () => { matchPlayer.ticksPerFrame = 1; });
+
 // --- Load match ---
 const loadBtn = document.getElementById("btn-init-match");
 loadBtn.addEventListener("click", () => {
@@ -151,7 +158,7 @@ function enterRoguelikeMode() {
   teamA.setRoguelikeMode(rogueSession.maxRulesPerSection);
 
   rogueUI = new RoguelikeUI(rogueSession, handleRoguePlay, handleRogueNext, handleRogueReset);
-  document.querySelector(".matchcontrols").appendChild(rogueUI.root);
+  rogueUI.root.style.display = null;
 
   if (rogueSession.turn > 0) {
     teamA.startNewTurnDistribution(0.5);
@@ -167,7 +174,7 @@ function exitRoguelikeMode() {
   toggleModeBtn.textContent = t('rogue_mode_btn');
   teamB.root.style.display = "none"; // teamB sigue oculto (lo maneja toggleTeam)
   loadBtn.style.display = null;
-  rogueUI?.root.remove();
+  document.getElementById('roguelike-panel').style.display = 'none';
   rogueUI = null;
 }
 
@@ -176,75 +183,50 @@ toggleModeBtn.addEventListener("click", () => {
 });
 
 async function handleRoguePlay() {
-  const playBtn = rogueUI.root.querySelector("button");
+  const playBtn = document.getElementById('rogue-play-btn');
   if (playBtn) playBtn.disabled = true;
 
+  const teamData = teamA.getTeamData();
+
   if (!rogueSession.isStarted) {
-    // Turno 1: crear equipo en backend con stats 0.1
-    const teamData = teamA.getTeamData();
-    const configuration = teamData.players.map(p => ({
-      name:               p.name,
-      default_zone_x:     parseFloat(p.defaultZone.x),
-      default_zone_y:     parseFloat(p.defaultZone.y),
-      max_speed:          0.1, accuracy:  0.1, control:  0.1,
-      reaction:           0.1, dribble:   0.1, strength: 0.1,
-      endurance:          0.1, scan_with_ball: null, scan_without_ball: null,
-      rules_with_ball:    p.rules[0],
-      rules_without_ball: p.rules[1],
-    }));
-    const teamName = (teamA.getTeamName() || "rogue") + "_" + Date.now();
-    const res = await fetch(CONSTANTS.server_url + "teams", {
+    // Turno 1: crear equipo y jugadores en backend con stats 0.1
+    const res = await fetch(CONSTANTS.server_url + "roguelike/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: teamName, configuration }),
+      body: JSON.stringify({
+        name:         (teamA.getTeamName() || "rogue") + "_" + Date.now(),
+        player_names: teamData.players.map(p => p.name),
+      }),
     }).then(r => r.json());
-    rogueSession.setTeamId(res.data?.id ?? res.id);
-
-  } else {
-    // Turno 2+: sincronizar stats y reglas en backend
-    const teamData = teamA.getTeamData();
-    const statMap = { maxSpeed: "max_speed", accuracy: "accuracy", control: "control",
-      reaction: "reaction", dribble: "dribble", strength: "strength", endurance: "endurance" };
-
-    for (let i = 0; i < teamData.players.length; i++) {
-      const p = teamData.players[i];
-      const locked = teamA.players[i]._lockedStats ?? {};
-
-      // Sync stat upgrades (0.05 per step)
-      for (const [jsKey, apiKey] of Object.entries(statMap)) {
-        const current = p[jsKey] ?? 0;
-        const floor   = locked[jsKey] ?? 0.1;
-        const steps   = Math.round((current - floor) / 0.05);
-        for (let s = 0; s < steps; s++) {
-          await fetch(`${CONSTANTS.server_url}teams/${rogueSession.teamId}/upgrade`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ position_index: i, attribute: apiKey }),
-          });
-        }
-      }
-
-      // Sync rules
-      for (const [slotKey, rules] of [["with_ball", p.rules[0]], ["without_ball", p.rules[1]]]) {
-        for (let j = 0; j < rules.length; j++) {
-          await fetch(`${CONSTANTS.server_url}teams/${rogueSession.teamId}/rule`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              position_index: i, slot: slotKey,
-              priority: j, condition: rules[j].condition, action: rules[j].action,
-            }),
-          });
-        }
-      }
-    }
+    rogueSession.setTeamId(res.game_team_id);
+    rogueSession.setPlayerIds(res.players.map(p => p.id));
   }
 
-  // Jugar partida
-  const data = await fetch(CONSTANTS.server_url + "match/play", {
+  // Enviar stats + zonas + reglas en un solo request
+  const playersPayload = teamData.players.map((p, i) => ({
+    game_player_id:     rogueSession.playerIds[i],
+    default_zone_x:     parseFloat(p.defaultZone.x),
+    default_zone_y:     parseFloat(p.defaultZone.y),
+    rules_with_ball:    p.rules[0],
+    rules_without_ball: p.rules[1],
+    max_speed:          p.maxSpeed,
+    accuracy:           p.accuracy,
+    control:            p.control,
+    reaction:           p.reaction,
+    dribble:            p.dribble,
+    strength:           p.strength,
+    endurance:          p.endurance,
+    scan_with_ball:     p.scanWithBall,
+    scan_without_ball:  p.scanWithoutBall,
+  }));
+
+  const data = await fetch(CONSTANTS.server_url + "roguelike/play", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ team_id: rogueSession.teamId }),
+    body: JSON.stringify({
+      game_team_id: rogueSession.teamId,
+      players:      playersPayload,
+    }),
   }).then(r => r.json());
 
   rogueSession.applyMatchResult(data);

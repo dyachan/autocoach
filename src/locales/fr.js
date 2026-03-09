@@ -34,6 +34,11 @@ export const fr = {
   default_keyword: "PAR DÉFAUT",
   else_keyword: "SINON",
   stats_button: "stats",
+  tactic_button: "Tactique",
+  tactic_save: "Sauvegarder",
+  tactic_load: "Charger",
+  tactic_name_placeholder: "Nom de la tactique...",
+  tactic_no_saved: "Aucune tactique sauvegardée",
   if_keyword: "SI",
   then_keyword: "ALORS",
 

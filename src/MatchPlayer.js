@@ -1,9 +1,12 @@
 import { t } from './i18n.js';
 
-const TICK_SPEED_MS = 20;
+const DEFAULT_TICK_SPEED_MS = 20;
+const DEFAULT_TICKS_PER_FRAME = 1;
 
 export class MatchPlayer {
   constructor({ render, teamA, teamB, logSystem, summaryRenderer }) {
+    this.tickSpeedMs = DEFAULT_TICK_SPEED_MS;
+    this.ticksPerFrame = DEFAULT_TICKS_PER_FRAME;
     this.render = render;
     this.teamA = teamA;
     this.teamB = teamB;
@@ -66,26 +69,32 @@ export class MatchPlayer {
   }
 
   _renderTick(loop = true) {
-    const tick = this.match[this.currentTick];
+    const steps = loop ? this.ticksPerFrame : 1;
 
-    this.render.update(tick);
+    for (let s = 0; s < steps; s++) {
+      if (this.isFinished) break;
 
-    this.logSystem.setContext(this.currentTick, this.match.length);
+      const tick = this.match[this.currentTick];
 
-    tick.teamA.forEach((p, i) => this.teamA.players[i].setCurrentRule(p.condition));
-    tick.teamB.forEach((p, i) => this.teamB.players[i].setCurrentRule(p.condition));
+      this.render.update(tick);
+      this.logSystem.setContext(this.currentTick, this.match.length);
 
-    this._updateBallPossession(tick.ownerTeam);
+      tick.teamA.forEach((p, i) => this.teamA.players[i].setCurrentRule(p.condition));
+      tick.teamB.forEach((p, i) => this.teamB.players[i].setCurrentRule(p.condition));
 
-    if (tick.goal === "Team A") {
-      this.scoreAEl.textContent = parseInt(this.scoreAEl.textContent) + 1;
-    } else if (tick.goal === "Team B") {
-      this.scoreBEl.textContent = parseInt(this.scoreBEl.textContent) + 1;
+      this._updateBallPossession(tick.ownerTeam);
+
+      if (tick.goal === "Team A") {
+        this.scoreAEl.textContent = parseInt(this.scoreAEl.textContent) + 1;
+      } else if (tick.goal === "Team B") {
+        this.scoreBEl.textContent = parseInt(this.scoreBEl.textContent) + 1;
+      }
+
+      tick.logs.forEach(log => this.logSystem.addLog(log));
+
+      if (loop) this.currentTick++;
     }
 
-    tick.logs.forEach(log => this.logSystem.addLog(log));
-
-    if (loop) this.currentTick++;
     this.progressEl.textContent = Math.floor(100 * this.currentTick / this.match.length);
 
     if (this.isFinished) {
@@ -94,7 +103,7 @@ export class MatchPlayer {
     }
 
     if (loop) {
-      this.timeoutId = setTimeout(() => this._renderTick(true), TICK_SPEED_MS);
+      this.timeoutId = setTimeout(() => this._renderTick(true), this.tickSpeedMs);
     }
   }
 

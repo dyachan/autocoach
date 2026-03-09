@@ -106,6 +106,17 @@ export class PlayerInstructionComponent {
       statsSection.style.display = statsSection.style.display === "none" ? null : "none";
     });
 
+    // Tactic panel
+    const tacticPanel = container.querySelector(".tactic-panel");
+    container.querySelector(".btn-tactic").addEventListener("click", () => {
+      const visible = tacticPanel.style.display !== "none";
+      tacticPanel.style.display = visible ? "none" : null;
+      if (!visible) this._refreshTacticSelect();
+    });
+    container.querySelector(".tactic-name-input").placeholder = t("tactic_name_placeholder");
+    container.querySelector(".btn-load-tactic").addEventListener("click", () => this._loadSelectedTactic());
+    container.querySelector(".btn-save-tactic").addEventListener("click", () => this._saveCurrentTactic());
+
     // Update output label, enforce budget cap, and trigger update
     statInputs.forEach((input) => {
       input.addEventListener("input", () => {
@@ -344,5 +355,69 @@ export class PlayerInstructionComponent {
       const addBtn = container.closest('article')?.querySelector('.btn-add-rule');
       if (addBtn) addBtn.disabled = container.querySelectorAll('.rule-item').length >= this._maxRules;
     });
+  }
+
+  // ── Tactic panel ─────────────────────────────────────────────────
+
+  static _STORAGE_KEY = 'player_tactics';
+
+  static _readAll() {
+    return JSON.parse(localStorage.getItem(PlayerInstructionComponent._STORAGE_KEY) || '[]');
+  }
+
+  static _writeAll(tactics) {
+    localStorage.setItem(PlayerInstructionComponent._STORAGE_KEY, JSON.stringify(tactics));
+  }
+
+  _refreshTacticSelect() {
+    const select = this.root.querySelector('.tactic-select');
+    select.innerHTML = '';
+    const tactics = PlayerInstructionComponent._readAll();
+    if (tactics.length === 0) {
+      const opt = document.createElement('option');
+      opt.disabled = true;
+      opt.selected = true;
+      opt.textContent = t('tactic_no_saved');
+      select.appendChild(opt);
+    } else {
+      tactics.forEach((tac, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = tac.name;
+        select.appendChild(opt);
+      });
+    }
+  }
+
+  _loadSelectedTactic() {
+    const select = this.root.querySelector('.tactic-select');
+    const idx = parseInt(select.value, 10);
+    const tactics = PlayerInstructionComponent._readAll();
+    if (!isNaN(idx) && tactics[idx]) {
+      const tactic = tactics[idx];
+      this.loadRules(tactic.rules);
+      if (tactic.zone) {
+        this.root.querySelector('.defaultzonex').value = tactic.zone.x;
+        this.root.querySelector('.defaultzoney').value = tactic.zone.y;
+        this.triggerUpdate();
+      }
+    }
+  }
+
+  _saveCurrentTactic() {
+    const input = this.root.querySelector('.tactic-name-input');
+    const name  = input.value.trim();
+    if (!name) return;
+    const tactics = PlayerInstructionComponent._readAll();
+    const existing = tactics.findIndex(t => t.name === name);
+    const entry = { name, rules: this.getRules(), zone: this.getDefaultZoneValues() };
+    if (existing >= 0) {
+      tactics[existing] = entry;
+    } else {
+      tactics.push(entry);
+    }
+    PlayerInstructionComponent._writeAll(tactics);
+    input.value = '';
+    this._refreshTacticSelect();
   }
 }

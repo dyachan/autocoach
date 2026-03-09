@@ -14,16 +14,42 @@
   <main>
     <section class="matchpanel">
       <article class="matchcontrols">
-        <select id="lang-switcher">
-          <option value="en">EN</option>
-          <option value="es">ES</option>
-          <option value="fr">FR</option>
-        </select>
-        <button id="btn-toggle-mode">Roguelike</button>
-        <button id="btn-init-match" disabled><span data-i18n="simulate">Simulate</span><span class="loader"></span></button>
-        <span id="matchpercent">0</span><span>%</span>
-        <button id="restartbutton" disabled style="display: none;" data-i18n="restart">Restart</button>
-        <button id="pausebutton" disabled data-i18n="pause">Pause</button>
+        <label>
+          <select id="lang-switcher">
+            <option value="en">EN</option>
+            <option value="es">ES</option>
+            <option value="fr">FR</option>
+          </select>
+          <button id="btn-toggle-mode">Roguelike</button>
+          <button id="btn-init-match" disabled><span data-i18n="simulate">Simulate</span><span class="loader"></span></button>
+        </label>
+        <label>
+          <span id="matchpercent">0</span><span>%</span>
+          <button id="restartbutton" disabled style="display: none;" data-i18n="restart">Restart</button>
+          <button id="pausebutton" disabled data-i18n="pause">Pause</button>
+          <button id="btn-fast-forward">>></button>
+        </label>
+
+        <!-- Roguelike panel (hidden when not in roguelike mode) -->
+        <div id="roguelike-panel" style="display:none">
+          <div id="rogue-view-turn">
+            <span id="rogue-turn-label"></span>
+            <span id="rogue-record-label"></span>
+            <span id="rogue-rules-label"></span>
+            <button id="rogue-play-btn"></button>
+          </div>
+          <div id="rogue-view-result" style="display:none">
+            <strong id="rogue-result-label"></strong>
+            <span id="rogue-opponent-label"></span>
+            <span data-i18n="rogue_distribute"></span>
+            <button id="rogue-next-btn" data-i18n="rogue_next_btn"></button>
+          </div>
+          <div id="rogue-view-gameover" style="display:none">
+            <strong data-i18n="rogue_game_over"></strong>
+            <span id="rogue-final-record"></span>
+            <button id="rogue-reset-btn" data-i18n="rogue_reset_btn"></button>
+          </div>
+        </div>
       </article>
       <canvas id="gameCanvas"></canvas>
       <article>
@@ -85,6 +111,19 @@
       <section>
         <label>
           <span class="player-name">Player</span>
+        </label>
+        <label>
+          <button class="btn-tactic" data-i18n="tactic_button"></button>
+          <div class="tactic-panel" style="display:none">
+            <div class="tactic-panel-load">
+              <select class="tactic-select"></select>
+              <button class="btn-load-tactic" data-i18n="tactic_load"></button>
+            </div>
+            <div class="tactic-panel-save">
+              <input class="tactic-name-input" type="text">
+              <button class="btn-save-tactic" data-i18n="tactic_save"></button>
+            </div>
+          </div>
         </label>
         <label>
           <span class="reservedword" data-i18n="default_zone">DEFAULT ZONE</span>

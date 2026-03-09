@@ -34,6 +34,11 @@ export const en = {
   default_keyword: "DEFAULT",
   else_keyword: "ELSE",
   stats_button: "stats",
+  tactic_button: "Tactic",
+  tactic_save: "Save",
+  tactic_load: "Load",
+  tactic_name_placeholder: "Tactic name...",
+  tactic_no_saved: "No saved tactics",
   if_keyword: "IF",
   then_keyword: "THEN",
 

@@ -34,6 +34,11 @@ export const es = {
   default_keyword: "POR DEFECTO",
   else_keyword: "SINO",
   stats_button: "stats",
+  tactic_button: "Táctica",
+  tactic_save: "Guardar",
+  tactic_load: "Cargar",
+  tactic_name_placeholder: "Nombre de táctica...",
+  tactic_no_saved: "Sin tácticas guardadas",
   if_keyword: "SI",
   then_keyword: "ENTONCES",
 

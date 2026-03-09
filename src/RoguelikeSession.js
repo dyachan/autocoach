@@ -4,6 +4,7 @@ export class RoguelikeSession {
   constructor() {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
     this.teamId        = saved?.teamId        ?? null;
+    this.playerIds     = saved?.playerIds     ?? [];
     this.turn          = saved?.turn          ?? 0;
     this.wins          = saved?.wins          ?? 0;
     this.draws         = saved?.draws         ?? 0;
@@ -33,9 +34,15 @@ export class RoguelikeSession {
     this.save();
   }
 
+  setPlayerIds(ids) {
+    this.playerIds = ids;
+    this.save();
+  }
+
   reset() {
     localStorage.removeItem(STORAGE_KEY);
     this.teamId        = null;
+    this.playerIds     = [];
     this.turn          = 0;
     this.wins          = 0;
     this.draws         = 0;
@@ -46,6 +53,7 @@ export class RoguelikeSession {
   save() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       teamId:        this.teamId,
+      playerIds:     this.playerIds,
       turn:          this.turn,
       wins:          this.wins,
       draws:         this.draws,
