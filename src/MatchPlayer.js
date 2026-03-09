@@ -98,6 +98,7 @@ export class MatchPlayer {
     this.progressEl.textContent = Math.floor(100 * this.currentTick / this.match.length);
 
     if (this.isFinished) {
+      this.timeoutId = null;
       this.summaryRenderer.render(this.summary);
       return;
     }

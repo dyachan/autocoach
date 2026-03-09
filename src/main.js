@@ -156,6 +156,13 @@ function enterRoguelikeMode() {
   teamB.root.style.display = "none";
   loadBtn.style.display = "none";
   teamA.setRoguelikeMode(rogueSession.maxRulesPerSection);
+  // Hide teamB's management controls and lock it (always read-only for the opponent)
+  teamB.root.querySelector('.btn-upload-team').style.display = 'none';
+  teamB.root.querySelector('.btn-select-team').style.display = 'none';
+  teamB.root.querySelector('.team-selection').style.display = 'none';
+  teamB.root.querySelector('.btn-export-team').closest('label').style.display = 'none';
+  teamB.setReadOnly(true);
+  document.querySelectorAll('.btn-change-team').forEach(b => b.style.display = 'none');
 
   rogueUI = new RoguelikeUI(rogueSession, handleRoguePlay, handleRogueNext, handleRogueReset);
   rogueUI.root.style.display = null;
@@ -241,6 +248,12 @@ async function handleRoguePlay() {
   matchPlayer.load(data.match, data.summary);
   matchPlayer.play();
 
+  // Phase 2: lock teamA (match already played), load opponent into teamB, show toggle
+  teamA.setReadOnly(true);
+  teamB.root.querySelector('.team-name').value = data.opponent.name;
+  teamB.loadTeamData({ players: data.opponent.players });
+  document.querySelectorAll('.btn-change-team').forEach(b => b.style.display = null);
+
   if (rogueSession.isGameOver) {
     rogueUI.refresh();
   } else {
@@ -249,6 +262,15 @@ async function handleRoguePlay() {
 }
 
 function handleRogueNext() {
+  // Return to teamA view and hide the toggle (phase 1 = own team only)
+  if (teamB.root.style.display !== 'none') toggleTeam();
+  document.querySelectorAll('.btn-change-team').forEach(b => b.style.display = 'none');
+  // Reset match player: clear log, scores, and restore field preview
+  matchPlayer.pause();
+  matchPlayer.load(null, null);
+  updateFieldPreview();
+  // Phase 1: unlock teamA editing, then apply turn distribution
+  teamA.setReadOnly(false);
   teamA.startNewTurnDistribution(0.5);
   teamA.updateRoguelikeRules(rogueSession.maxRulesPerSection);
   rogueUI.refresh();

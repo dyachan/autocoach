@@ -42,8 +42,9 @@ export class RoguelikeUI {
       `❌ ${s.losses}/5  ✅ ${s.wins}  = ${s.draws}`;
     document.getElementById('rogue-rules-label').textContent =
       `${t('rogue_max_rules')}: ${s.maxRulesPerSection}`;
-    document.getElementById('rogue-play-btn').textContent =
-      s.isStarted ? t('rogue_play_btn') : t('rogue_create_btn');
+    const playBtn = document.getElementById('rogue-play-btn');
+    playBtn.textContent = s.isStarted ? t('rogue_play_btn') : t('rogue_create_btn');
+    playBtn.disabled = false;
   }
 
   showResult(result, goalsFor, goalsAgainst, opponentName) {

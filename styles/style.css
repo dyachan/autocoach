@@ -273,6 +273,18 @@ select {
   cursor: pointer;
   padding: 0;
 }
+.player-stats-grid div.stat-input-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center
+}
+.player-stats-grid div.stat-input-container .locked-stat {
+  transform: translateX(10px);
+  border-radius: var(--gap-small);
+  height: var(--gap);
+  background-image: radial-gradient(circle at 100% 50%, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0) var(--gap), var(--primary-background-color) var(--gap));
+}
 .stat-total-display {
   grid-column: 1 / -1;
   text-align: right;

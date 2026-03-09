@@ -328,9 +328,16 @@ export class PlayerInstructionComponent {
   lockCurrentStats() {
     this._lockedStats = {};
     this.root.querySelectorAll('.stat-input').forEach(input => {
-      this._lockedStats[input.dataset.stat] = parseFloat(input.value);
+      const lockedVal = parseFloat(input.value);
+      this._lockedStats[input.dataset.stat] = lockedVal;
       input.min = input.value;
       input.disabled = true;
+      const lockedEl = input.closest('.stat-input-container')?.querySelector('.locked-stat');
+      if (lockedEl) {
+        const lockedPct = parseFloat((lockedVal * 100).toFixed(1));
+        lockedEl.style.width = lockedPct + '%';
+        input.style.width = (100 - lockedPct) + '%';
+      }
     });
   }
 

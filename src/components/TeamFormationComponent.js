@@ -272,10 +272,20 @@ export class TeamFormationComponent {
   /** Hides team-management controls and limits rules per section. */
   setRoguelikeMode(maxRules) {
     this.root.querySelector('.btn-upload-team').style.display = 'none';
-    this.root.querySelector('.btn-select-team').closest('label').style.display = 'none';
+    this.root.querySelector('.btn-select-team').style.display = 'none';
+    this.root.querySelector('.team-selection').style.display = 'none';
     this.root.querySelector('.btn-export-team').closest('label').style.display = 'none';
     this.root.querySelector('.btn-change-team').style.display = 'none';
     this.players.forEach(p => p.setMaxRules(maxRules));
+  }
+
+  /**
+   * Lock or unlock all interactive elements (inputs, selects, buttons)
+   * except the team-toggle button. Used to enforce read-only phases.
+   */
+  setReadOnly(readOnly) {
+    this.root.querySelectorAll('input, select, button:not(.btn-change-team):not(.btn-stats)')
+      .forEach(el => { el.disabled = readOnly; });
   }
 
   /** Updates the max-rules limit without recreating any component. */
