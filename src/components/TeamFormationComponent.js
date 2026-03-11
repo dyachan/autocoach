@@ -24,7 +24,7 @@ export class TeamFormationComponent {
   setMyTeamHasBall(value){
     this.players.forEach( (player) => {
       player.setMyTeamHasBall(value);
-      player.setCurrentRule("");
+      // player.setCurrentRule("");
     });
   }
 
@@ -286,6 +286,17 @@ export class TeamFormationComponent {
   setReadOnly(readOnly) {
     this.root.querySelectorAll('input, select, button:not(.btn-change-team):not(.btn-stats)')
       .forEach(el => { el.disabled = readOnly; });
+  }
+
+  setNameEditable(editable) {
+    this.root.querySelector('.team-name').disabled = !editable;
+  }
+
+  setCounters(counters) {
+    const el = this.root.querySelector('.other-team-counters');
+    if (!counters) { el.textContent = ''; return; }
+    const { wins = 0, draws = 0, losses = 0, matches_played = 0 } = counters;
+    el.textContent = `${matches_played} = ${wins} + ${draws} + ${losses}`;
   }
 
   /** Updates the max-rules limit without recreating any component. */

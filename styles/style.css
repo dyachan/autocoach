@@ -144,6 +144,10 @@ select {
   max-width: 350px;
 }
 
+.other-team-counters{
+  flex-grow: 2;
+}
+
 .team-message {
   min-width: 250px;           /* clave para que pueda romper línea dentro de flex */
   white-space: normal;    /* permite saltos de línea */
@@ -218,6 +222,10 @@ select {
 .player-instructions .defaultaction .active  {
   background: var(--background-color);
   color: var(--active-background-color);
+}
+
+.defaultaction.active{
+  border: var(--warning-color) solid thin;
 }
 
 .btn-add-rule{

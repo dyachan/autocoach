@@ -151,10 +151,14 @@ let isRoguelikeMode = false;
 const toggleModeBtn = document.getElementById("btn-toggle-mode");
 
 function enterRoguelikeMode() {
+  rogueSession.reset();
   isRoguelikeMode = true;
   toggleModeBtn.textContent = t('sim_mode_btn');
   teamB.root.style.display = "none";
   loadBtn.style.display = "none";
+  teamA.setReadOnly(false);
+  teamA.setNameEditable(true);
+  teamB.setCounters(null);
   teamA.setRoguelikeMode(rogueSession.maxRulesPerSection);
   // Hide teamB's management controls and lock it (always read-only for the opponent)
   teamB.root.querySelector('.btn-upload-team').style.display = 'none';
@@ -209,6 +213,9 @@ async function handleRoguePlay() {
     rogueSession.setPlayerIds(res.players.map(p => p.id));
   }
 
+  // Lock team name — name is set on first play and cannot change afterwards
+  teamA.setNameEditable(false);
+
   // Enviar stats + zonas + reglas en un solo request
   const playersPayload = teamData.players.map((p, i) => ({
     game_player_id:     rogueSession.playerIds[i],
@@ -252,6 +259,7 @@ async function handleRoguePlay() {
   teamA.setReadOnly(true);
   teamB.root.querySelector('.team-name').value = data.opponent.name;
   teamB.loadTeamData({ players: data.opponent.players });
+  teamB.setCounters(data.opponent);
   document.querySelectorAll('.btn-change-team').forEach(b => b.style.display = null);
 
   if (rogueSession.isGameOver) {
@@ -269,8 +277,9 @@ function handleRogueNext() {
   matchPlayer.pause();
   matchPlayer.load(null, null);
   updateFieldPreview();
-  // Phase 1: unlock teamA editing, then apply turn distribution
+  // Phase 1: unlock teamA editing (but keep name locked), then apply turn distribution
   teamA.setReadOnly(false);
+  teamA.setNameEditable(false);
   teamA.startNewTurnDistribution(0.5);
   teamA.updateRoguelikeRules(rogueSession.maxRulesPerSection);
   rogueUI.refresh();

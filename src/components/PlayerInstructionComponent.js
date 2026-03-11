@@ -30,7 +30,8 @@ export class PlayerInstructionComponent {
       this.myTeamHasBall = false;
     }
 
-    // inactive rules
+    console.log("clear");
+    // inactive rules other container
     this.hasBallContainer[value ? 1 : 0].querySelectorAll(".rule-item").forEach(rule => {
       rule.classList.remove("active");
     });
@@ -40,6 +41,8 @@ export class PlayerInstructionComponent {
   setCurrentRule(ruleId){
     let containerIndex = this.myTeamHasBall ? 0 : 1;
 
+    console.log("r", ruleId);
+    console.log(typeof ruleId);
     this.hasBallContainer[containerIndex].querySelectorAll(".rule-item").forEach(rule => {
       const condSelect = rule.querySelector(".rule-condition");
       if (Number(condSelect.value) === ruleId) { // ruleId is an int from backend
