@@ -1,20 +1,20 @@
 import { t } from './i18n.js';
 
 export class RoguelikeUI {
-  constructor(session, onPlay, onNextTurn, onReset) {
+  constructor(root, session, onPlay, onNextTurn, onReset) {
     this.session    = session;
     this.onPlay     = onPlay;
     this.onNextTurn = onNextTurn;
     this.onReset    = onReset;
 
-    this.root         = document.getElementById('roguelike-panel');
-    this._viewTurn    = document.getElementById('rogue-view-turn');
-    this._viewResult  = document.getElementById('rogue-view-result');
-    this._viewGameover= document.getElementById('rogue-view-gameover');
+    this.root         = root;
+    this._viewTurn    = root.querySelector('#rogue-view-turn');
+    this._viewResult  = root.querySelector('#rogue-view-result');
+    this._viewGameover= root.querySelector('#rogue-view-gameover');
 
-    document.getElementById('rogue-play-btn').addEventListener('click', () => this.onPlay());
-    document.getElementById('rogue-next-btn').addEventListener('click', () => this.onNextTurn());
-    document.getElementById('rogue-reset-btn').addEventListener('click', () => this.onReset());
+    root.querySelector('#rogue-play-btn').addEventListener('click', () => this.onPlay());
+    root.querySelector('#rogue-next-btn').addEventListener('click', () => this.onNextTurn());
+    root.querySelector('#rogue-reset-btn').addEventListener('click', () => this.onReset());
 
     this._render();
   }
@@ -27,32 +27,41 @@ export class RoguelikeUI {
 
   _render() {
     const s = this.session;
+    const r = this.root;
 
     if (s.isGameOver) {
-      this._show('gameover');
-      document.getElementById('rogue-final-record').textContent =
-        `${s.wins}W  ${s.draws}D  ${s.losses}L`;
+      this.showEnded('rogue_game_over');
       return;
     }
 
     this._show('turn');
-    document.getElementById('rogue-turn-label').textContent =
-      `${t('rogue_turn')} ${s.turn + 1}`;
-    document.getElementById('rogue-record-label').textContent =
-      `❌ ${s.losses}/5  ✅ ${s.wins}  = ${s.draws}`;
-    document.getElementById('rogue-rules-label').textContent =
-      `${t('rogue_max_rules')}: ${s.maxRulesPerSection}`;
-    const playBtn = document.getElementById('rogue-play-btn');
+    r.querySelector('#rogue-turn-label').textContent = `${s.turn} = `;
+    r.querySelector('#rogue-record-label').textContent = `${s.wins} + ${s.draws} + ${s.losses} (/5)`;
+    const playBtn = r.querySelector('#rogue-play-btn');
     playBtn.textContent = s.isStarted ? t('rogue_play_btn') : t('rogue_create_btn');
     playBtn.disabled = false;
+  }
+
+  showEnded(titleKey = 'rogue_game_over') {
+    this._show('gameover');
+    const s = this.session;
+    this.root.querySelector('#rogue-ended-title').textContent = t(titleKey);
+    this.root.querySelector('#rogue-final-record').textContent =
+      `${s.wins}W  ${s.draws}D  ${s.losses}L`;
+  }
+
+  showFrontier() {
+    this._show('result');
+    this.root.querySelector('#rogue-result-label').textContent = t('rogue_no_opponent');
+    this.root.querySelector('#rogue-opponent-label').textContent = '';
   }
 
   showResult(result, goalsFor, goalsAgainst, opponentName) {
     const labelKey = { win: 'rogue_result_win', loss: 'rogue_result_loss', draw: 'rogue_result_draw' }[result];
     this._show('result');
-    document.getElementById('rogue-result-label').textContent =
+    this.root.querySelector('#rogue-result-label').textContent =
       `${labelKey ? t(labelKey) : result}  ${goalsFor} - ${goalsAgainst}`;
-    document.getElementById('rogue-opponent-label').textContent =
+    this.root.querySelector('#rogue-opponent-label').textContent =
       `${t('rogue_vs')} ${opponentName}`;
   }
 

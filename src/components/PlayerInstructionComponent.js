@@ -30,7 +30,6 @@ export class PlayerInstructionComponent {
       this.myTeamHasBall = false;
     }
 
-    console.log("clear");
     // inactive rules other container
     this.hasBallContainer[value ? 1 : 0].querySelectorAll(".rule-item").forEach(rule => {
       rule.classList.remove("active");
@@ -41,8 +40,6 @@ export class PlayerInstructionComponent {
   setCurrentRule(ruleId){
     let containerIndex = this.myTeamHasBall ? 0 : 1;
 
-    console.log("r", ruleId);
-    console.log(typeof ruleId);
     this.hasBallContainer[containerIndex].querySelectorAll(".rule-item").forEach(rule => {
       const condSelect = rule.querySelector(".rule-condition");
       if (Number(condSelect.value) === ruleId) { // ruleId is an int from backend
@@ -313,11 +310,16 @@ export class PlayerInstructionComponent {
     const initVal = 0.1;
     const statInputs = this.root.querySelectorAll('.stat-input');
     statInputs.forEach(input => {
+      input.min = 0;
+      input.style.width = '';
       input.value = initVal;
       input.closest('label').querySelector('output').value = initVal.toFixed(2);
+      const lockedEl = input.closest('.stat-input-container')?.querySelector('.locked-stat');
+      if (lockedEl) lockedEl.style.width = '';
     });
     this.maxTotal = Math.round(statInputs.length * initVal * 100) / 100;
     this.updateStatsDisplay();
+    this.loadRules([[], []]);
     this.lockCurrentStats();
   }
 
@@ -382,7 +384,10 @@ export class PlayerInstructionComponent {
   _refreshTacticSelect() {
     const select = this.root.querySelector('.tactic-select');
     select.innerHTML = '';
-    const tactics = PlayerInstructionComponent._readAll();
+    const all = PlayerInstructionComponent._readAll();
+    const tactics = this._maxRules !== undefined
+      ? all.filter(tac => tac.rules.every(section => section.length <= this._maxRules))
+      : all;
     if (tactics.length === 0) {
       const opt = document.createElement('option');
       opt.disabled = true;
@@ -390,9 +395,9 @@ export class PlayerInstructionComponent {
       opt.textContent = t('tactic_no_saved');
       select.appendChild(opt);
     } else {
-      tactics.forEach((tac, i) => {
+      tactics.forEach((tac) => {
         const opt = document.createElement('option');
-        opt.value = i;
+        opt.value = all.indexOf(tac);
         opt.textContent = tac.name;
         select.appendChild(opt);
       });

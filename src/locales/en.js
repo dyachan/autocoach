@@ -81,6 +81,14 @@ export const en = {
   rogue_result_loss: "Defeat",
   rogue_result_draw: "Draw",
   rogue_vs: "vs",
+  rogue_no_opponent: "No opponent at your level",
+  rogue_congrats_title: "You're a pioneer!",
+  rogue_congrats_subtitle: "No opponent has reached your level yet. You are at the frontier.",
+  rogue_congrats_close: "Continue",
+  rogue_tutorial_stat_title: "Training time",
+  rogue_tutorial_stat_body: "Each player can distribute 0.5 stat points per turn.",
+  rogue_tutorial_rules_title: "More experience",
+  rogue_tutorial_rules_body: "Every 3 turns players grow and can receive more orders.",
 
   // Roles (only first letter shown on canvas)
   goalkeeper: "Goalkeeper",

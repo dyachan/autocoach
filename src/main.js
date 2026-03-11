@@ -168,7 +168,8 @@ function enterRoguelikeMode() {
   teamB.setReadOnly(true);
   document.querySelectorAll('.btn-change-team').forEach(b => b.style.display = 'none');
 
-  rogueUI = new RoguelikeUI(rogueSession, handleRoguePlay, handleRogueNext, handleRogueReset);
+  const roguePanel = teamA.root.querySelector('#roguelike-panel');
+  rogueUI = new RoguelikeUI(roguePanel, rogueSession, handleRoguePlay, handleRogueNext, handleRogueReset);
   rogueUI.root.style.display = null;
 
   if (rogueSession.turn > 0) {
@@ -180,12 +181,38 @@ function enterRoguelikeMode() {
   }
 }
 
+const congratsOverlay = document.getElementById('rogue-congrats-overlay');
+let _pendingOverlay = null; // { type: 'pioneer'|'gameover', team }
+
+document.getElementById('rogue-congrats-close').addEventListener('click', () => {
+  congratsOverlay.style.display = 'none';
+  const type = _pendingOverlay?.type;
+  _pendingOverlay = null;
+  if (type === 'gameover') {
+    rogueUI.showEnded('rogue_game_over');
+  } else if (type === 'pioneer' || type === 'frontier') {
+    rogueUI.showEnded('rogue_congrats_title');
+  } else {
+    _doNextTurn();
+  }
+});
+
+function showCongratsPanel(title, subtitle, team = null) {
+  document.getElementById('rogue-congrats-title').textContent = title;
+  document.querySelector('.rogue-congrats-subtitle').textContent = subtitle;
+  document.getElementById('rogue-congrats-team').textContent = team ? teamA.getTeamName() : '';
+  document.getElementById('rogue-congrats-record').textContent = team
+    ? `${team.matches_played} = ${team.wins} + ${team.draws} + ${team.losses}` : '';
+  congratsOverlay.style.display = 'flex';
+}
+
 function exitRoguelikeMode() {
   isRoguelikeMode = false;
+  congratsOverlay.style.display = 'none';
   toggleModeBtn.textContent = t('rogue_mode_btn');
   teamB.root.style.display = "none"; // teamB sigue oculto (lo maneja toggleTeam)
   loadBtn.style.display = null;
-  document.getElementById('roguelike-panel').style.display = 'none';
+  // document.getElementById('roguelike-panel').style.display = 'none';
   rogueUI = null;
 }
 
@@ -205,7 +232,7 @@ async function handleRoguePlay() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name:         (teamA.getTeamName() || "rogue") + "_" + Date.now(),
+        name:         (teamA.getTeamName() || Date.now()),
         player_names: teamData.players.map(p => p.name),
       }),
     }).then(r => r.json());
@@ -243,6 +270,12 @@ async function handleRoguePlay() {
     }),
   }).then(r => r.json());
 
+  if (data.no_opponent_at_level) {
+    _pendingOverlay = { type: 'frontier', team: data.team };
+    rogueUI.showFrontier();
+    return;
+  }
+
   rogueSession.applyMatchResult(data);
 
   // Reproducir replay
@@ -262,27 +295,52 @@ async function handleRoguePlay() {
   teamB.setCounters(data.opponent);
   document.querySelectorAll('.btn-change-team').forEach(b => b.style.display = null);
 
+  rogueUI.showResult(data.result, data.goals_for, data.goals_against, data.opponent.name);
+
   if (rogueSession.isGameOver) {
-    rogueUI.refresh();
-  } else {
-    rogueUI.showResult(data.result, data.goals_for, data.goals_against, data.opponent.name);
+    _pendingOverlay = { type: 'gameover', team: data.team };
+  } else if (data.is_pioneer && data.result !== 'loss') {
+    _pendingOverlay = { type: 'pioneer', team: data.team };
   }
 }
 
-function handleRogueNext() {
-  // Return to teamA view and hide the toggle (phase 1 = own team only)
+function _doNextTurn() {
   if (teamB.root.style.display !== 'none') toggleTeam();
   document.querySelectorAll('.btn-change-team').forEach(b => b.style.display = 'none');
-  // Reset match player: clear log, scores, and restore field preview
   matchPlayer.pause();
   matchPlayer.load(null, null);
   updateFieldPreview();
-  // Phase 1: unlock teamA editing (but keep name locked), then apply turn distribution
   teamA.setReadOnly(false);
   teamA.setNameEditable(false);
   teamA.startNewTurnDistribution(0.5);
   teamA.updateRoguelikeRules(rogueSession.maxRulesPerSection);
   rogueUI.refresh();
+}
+
+function handleRogueNext() {
+  if (_pendingOverlay) {
+    const { type, team } = _pendingOverlay;
+    if (type === 'gameover') {
+      showCongratsPanel(t('rogue_game_over'), '', team);
+    } else {
+      showCongratsPanel(t('rogue_congrats_title'), t('rogue_congrats_subtitle'), team);
+    }
+    return; // close button will handle _doNextTurn or rogueUI.refresh
+  }
+
+  const turn = rogueSession.turn;
+  if (turn === 1) {
+    _pendingOverlay = { type: 'tutorial' };
+    showCongratsPanel(t('rogue_tutorial_stat_title'), t('rogue_tutorial_stat_body'));
+    return;
+  }
+  if (turn > 0 && turn % 3 === 0) {
+    _pendingOverlay = { type: 'tutorial' };
+    showCongratsPanel(t('rogue_tutorial_rules_title'), t('rogue_tutorial_rules_body'));
+    return;
+  }
+
+  _doNextTurn();
 }
 
 function handleRogueReset() {

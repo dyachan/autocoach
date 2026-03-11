@@ -89,6 +89,12 @@ export class TeamFormationComponent {
     const btnUploadTeam = container.querySelector(".btn-upload-team");
     btnUploadTeam.addEventListener("click", () => this.uploadTeam());
 
+    if (this.teamName === "Team A") {
+      const rogueTpl = document.getElementById("tpl-roguelike-panel");
+      const rogueNode = rogueTpl.content.cloneNode(true);
+      container.querySelector(".btn-upload-team").before(rogueNode);
+    }
+
     if(this.teamName === "Team A"){
       titleEl.classList.add("teamacolor");
       btnExport.classList.add("teamabgcolor");
@@ -285,7 +291,9 @@ export class TeamFormationComponent {
    */
   setReadOnly(readOnly) {
     this.root.querySelectorAll('input, select, button:not(.btn-change-team):not(.btn-stats)')
-      .forEach(el => { el.disabled = readOnly; });
+      .forEach(el => {
+        if (!el.closest('#roguelike-panel')) el.disabled = readOnly;
+      });
   }
 
   setNameEditable(editable) {

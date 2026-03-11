@@ -81,6 +81,14 @@ export const es = {
   rogue_result_loss: "Derrota",
   rogue_result_draw: "Empate",
   rogue_vs: "vs",
+  rogue_no_opponent: "Sin oponente en tu nivel",
+  rogue_congrats_title: "¡Eres un pionero!",
+  rogue_congrats_subtitle: "Ningún oponente ha llegado a tu nivel todavía. Estás en la frontera.",
+  rogue_congrats_close: "Continuar",
+  rogue_tutorial_stat_title: "Hora de entrenar",
+  rogue_tutorial_stat_body: "Cada jugador puede distribuir 0.5 puntos de stat por turno.",
+  rogue_tutorial_rules_title: "Más experiencia",
+  rogue_tutorial_rules_body: "Cada 3 turnos los jugadores crecen y pueden recibir más órdenes.",
 
   // Roles (solo se muestra la primera letra en el canvas)
   goalkeeper: "Portero",
