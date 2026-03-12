@@ -15,8 +15,6 @@ export const fr = {
   upload_team: "Envoyer l'équipe",
   select_team: "Sélectionner l'équipe",
   other_team: "Autre équipe",
-  export_team: "Exporter l'équipe",
-  import_team: "Importer l'équipe",
 
   // Messages d'envoi
   upload_confirm_1: "Envoyer cette équipe ?",

@@ -21,7 +21,6 @@
             <option value="fr">FR</option>
           </select>
           <button id="btn-toggle-mode">Roguelike</button>
-          <button id="btn-init-match" disabled><span data-i18n="simulate">Simulate</span><span class="loader"></span></button>
         </label>
 
         <label>
@@ -73,12 +72,8 @@
           <select class="team-selection"></select>
           <button class="btn-select-team"><span data-i18n="select_team">Select Team</span> <span class="loader"></span></button>
           <div class="other-team-counters"></div>
+          <button class="btn-simulate" disabled><span data-i18n="simulate">Simulate</span><span class="loader"></span></button>
           <button class="btn-change-team" data-i18n="other_team">Other team</button>
-        </label>
-        <label style="justify-content: space-between; display: none;">
-          <button class="btn-export-team" data-i18n="export_team">Export Team</button>
-          <input class="import-area"></input>
-          <button class="btn-import-team" data-i18n="import_team">Import Team</button>
         </label>
       </div>
       <div class="players-wrapper"></div>

@@ -1,20 +1,12 @@
 import { t } from './i18n.js';
 
 export class RoguelikeUI {
-  constructor(root, session, onPlay, onNextTurn, onReset) {
-    this.session    = session;
-    this.onPlay     = onPlay;
-    this.onNextTurn = onNextTurn;
-    this.onReset    = onReset;
-
-    this.root         = root;
+  constructor(root, session) {
+    this.session = session;
+    this.root    = root;
     this._viewTurn    = root.querySelector('#rogue-view-turn');
     this._viewResult  = root.querySelector('#rogue-view-result');
     this._viewGameover= root.querySelector('#rogue-view-gameover');
-
-    root.querySelector('#rogue-play-btn').addEventListener('click', () => this.onPlay());
-    root.querySelector('#rogue-next-btn').addEventListener('click', () => this.onNextTurn());
-    root.querySelector('#rogue-reset-btn').addEventListener('click', () => this.onReset());
 
     this._render();
   }

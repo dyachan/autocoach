@@ -15,8 +15,6 @@ export const es = {
   upload_team: "Subir Equipo",
   select_team: "Seleccionar Equipo",
   other_team: "Otro equipo",
-  export_team: "Exportar Equipo",
-  import_team: "Importar Equipo",
 
   // Mensajes de subida
   upload_confirm_1: "¿Subir este equipo?",

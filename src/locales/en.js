@@ -15,8 +15,6 @@ export const en = {
   upload_team: "Upload Team",
   select_team: "Select Team",
   other_team: "Other team",
-  export_team: "Export Team",
-  import_team: "Import Team",
 
   // Upload messages
   upload_confirm_1: "Upload this team?",

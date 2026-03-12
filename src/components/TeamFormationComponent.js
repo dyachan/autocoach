@@ -77,12 +77,6 @@ export class TeamFormationComponent {
       this.players.push(playerComp);
     });
 
-    // wire import/export buttons from the template
-    const btnExport = container.querySelector(".btn-export-team");
-    const btnImport = container.querySelector(".btn-import-team");
-    btnExport.addEventListener("click", () => this.exportTeam());
-    btnImport.addEventListener("click", () => this.importTeam());
-
     const btnSelectTeam = container.querySelector(".btn-select-team");
     btnSelectTeam.addEventListener("click", () => this.selectTeam());
 
@@ -97,24 +91,16 @@ export class TeamFormationComponent {
 
     if(this.teamName === "Team A"){
       titleEl.classList.add("teamacolor");
-      btnExport.classList.add("teamabgcolor");
-      btnImport.classList.add("teamabgcolor");
       btnSelectTeam.classList.add("teamabgcolor");
       container.querySelector(".btn-change-team").classList.add("teambbgcolor");
     } else {
       titleEl.classList.add("teambcolor");
-      btnExport.classList.add("teambbgcolor");
-      btnImport.classList.add("teambbgcolor");
       btnSelectTeam.classList.add("teambbgcolor");
       container.querySelector(".btn-change-team").classList.add("teamabgcolor");
     }
     
     this.root = container;
     
-    if(localStorage.getItem(this.teamName)){
-      this.root.querySelector(".import-area").value = localStorage.getItem(this.teamName);
-      this.importTeam();
-    }
     return container;
   }
 
@@ -145,27 +131,6 @@ export class TeamFormationComponent {
       }
     });
     this.triggerUpdate();
-  }
-
-  exportTeam() {
-    const data = JSON.stringify(this.getTeamData());
-    this.root.querySelector(".import-area").value = data;
-
-    // manza pilleria
-    // const blob = new Blob([data], { type: "application/json" });
-    // const url = URL.createObjectURL(blob);
-    // const a = document.createElement("a");
-    // a.href = url;
-    // a.download = `${this.teamName.replace(/\s+/g, "_")}.json`;
-    // document.body.appendChild(a);
-    // a.click();
-    // a.remove();
-    // URL.revokeObjectURL(url);
-  }
-
-  importTeam() {
-    this.loadTeamData(JSON.parse(this.root.querySelector(".import-area").value || "[]"));
-    localStorage.setItem(this.teamName, this.root.querySelector(".import-area").value);
   }
 
   selectTeam() {
@@ -280,9 +245,17 @@ export class TeamFormationComponent {
     this.root.querySelector('.btn-upload-team').style.display = 'none';
     this.root.querySelector('.btn-select-team').style.display = 'none';
     this.root.querySelector('.team-selection').style.display = 'none';
-    this.root.querySelector('.btn-export-team').closest('label').style.display = 'none';
     this.root.querySelector('.btn-change-team').style.display = 'none';
     this.players.forEach(p => p.setMaxRules(maxRules));
+  }
+
+  /** Restores team-management controls hidden by setRoguelikeMode. */
+  exitRoguelikeMode() {
+    this.root.querySelector('.btn-upload-team').style.display = null;
+    this.root.querySelector('.btn-select-team').style.display = null;
+    this.root.querySelector('.team-selection').style.display = null;
+    this.root.querySelector('.btn-change-team').style.display = null;
+    this.players.forEach(p => p.setMaxRules(undefined));
   }
 
   /**

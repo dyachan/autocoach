@@ -93,29 +93,37 @@ fastForwardBtn.addEventListener("mouseleave",  () => { matchPlayer.ticksPerFrame
 fastForwardBtn.addEventListener("touchend",    () => { matchPlayer.ticksPerFrame = 1; });
 
 // --- Load match ---
-const loadBtn = document.getElementById("btn-init-match");
-loadBtn.addEventListener("click", () => {
-  loadBtn.disabled = true;
+function setSimulateBtns(disabled, display = undefined) {
+  document.querySelectorAll('.btn-simulate').forEach(b => {
+    b.disabled = disabled;
+    if (display !== undefined) b.style.display = display;
+  });
+}
 
-  matchPlayer.pause();
+document.querySelectorAll('.btn-simulate').forEach(btn => {
+  btn.addEventListener('click', () => {
+    setSimulateBtns(true);
 
-  fetch(CONSTANTS.server_url + "play", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ teamA: teamA.getTeamData(), teamB: teamB.getTeamData() }),
-  })
-    .then(r => r.json())
-    .then(data => {
-      loadBtn.disabled = false;
-      document.getElementById("pausebutton").disabled = false;
-      document.getElementById("restartbutton").disabled = false;
-      document.getElementById("teamalabel").textContent = teamA.getTeamName();
-      document.getElementById("teamblabel").textContent = teamB.getTeamName();
+    matchPlayer.pause();
 
-      logSystem.addRawEntry("-------");
-      matchPlayer.load(data.match, data.summary);
-      matchPlayer.play();
-    });
+    fetch(CONSTANTS.server_url + "play", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ teamA: teamA.getTeamData(), teamB: teamB.getTeamData() }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        setSimulateBtns(false);
+        document.getElementById("pausebutton").disabled = false;
+        document.getElementById("restartbutton").disabled = false;
+        document.getElementById("teamalabel").textContent = teamA.getTeamName();
+        document.getElementById("teamblabel").textContent = teamB.getTeamName();
+
+        logSystem.addRawEntry("-------");
+        matchPlayer.load(data.match, data.summary);
+        matchPlayer.play();
+      });
+  });
 });
 
 // --- Fetch teams from server ---
@@ -131,7 +139,7 @@ function updateTeams() {
 }
 
 updateTeams().then(() => {
-  loadBtn.disabled = false;
+  setSimulateBtns(false);
 });
 
 // --- i18n ---
@@ -154,22 +162,18 @@ function enterRoguelikeMode() {
   rogueSession.reset();
   isRoguelikeMode = true;
   toggleModeBtn.textContent = t('sim_mode_btn');
+  teamA.root.style.display = null;
   teamB.root.style.display = "none";
-  loadBtn.style.display = "none";
+  setSimulateBtns(true, 'none');
   teamA.setReadOnly(false);
   teamA.setNameEditable(true);
   teamB.setCounters(null);
   teamA.setRoguelikeMode(rogueSession.maxRulesPerSection);
-  // Hide teamB's management controls and lock it (always read-only for the opponent)
-  teamB.root.querySelector('.btn-upload-team').style.display = 'none';
-  teamB.root.querySelector('.btn-select-team').style.display = 'none';
-  teamB.root.querySelector('.team-selection').style.display = 'none';
-  teamB.root.querySelector('.btn-export-team').closest('label').style.display = 'none';
+  teamB.setRoguelikeMode(rogueSession.maxRulesPerSection);
   teamB.setReadOnly(true);
-  document.querySelectorAll('.btn-change-team').forEach(b => b.style.display = 'none');
 
   const roguePanel = teamA.root.querySelector('#roguelike-panel');
-  rogueUI = new RoguelikeUI(roguePanel, rogueSession, handleRoguePlay, handleRogueNext, handleRogueReset);
+  rogueUI = new RoguelikeUI(roguePanel, rogueSession);
   rogueUI.root.style.display = null;
 
   if (rogueSession.turn > 0) {
@@ -210,10 +214,22 @@ function exitRoguelikeMode() {
   isRoguelikeMode = false;
   congratsOverlay.style.display = 'none';
   toggleModeBtn.textContent = t('rogue_mode_btn');
-  teamB.root.style.display = "none"; // teamB sigue oculto (lo maneja toggleTeam)
-  loadBtn.style.display = null;
-  // document.getElementById('roguelike-panel').style.display = 'none';
-  rogueUI = null;
+  setSimulateBtns(false, null);
+
+  if (rogueUI) {
+    rogueUI.root.style.display = 'none';
+    rogueUI = null;
+  }
+
+  teamA.exitRoguelikeMode();
+  teamA.setNameEditable(false);
+  teamA.setReadOnly(false);
+
+  teamB.exitRoguelikeMode();
+  teamB.setReadOnly(false);
+  teamB.setCounters(null);
+
+  document.querySelectorAll('.btn-change-team').forEach(b => b.style.display = null);
 }
 
 toggleModeBtn.addEventListener("click", () => {
@@ -348,3 +364,8 @@ function handleRogueReset() {
   exitRoguelikeMode();
   enterRoguelikeMode();
 }
+
+const roguePanel = teamA.root.querySelector('#roguelike-panel');
+roguePanel.querySelector('#rogue-play-btn').addEventListener('click', () => handleRoguePlay());
+roguePanel.querySelector('#rogue-next-btn').addEventListener('click', () => handleRogueNext());
+roguePanel.querySelector('#rogue-reset-btn').addEventListener('click', () => handleRogueReset());
