@@ -38,7 +38,7 @@ export const es = {
   tactic_name_placeholder: "Nombre de táctica...",
   tactic_no_saved: "Sin tácticas guardadas",
   if_keyword: "SI",
-  then_keyword: "ENTONCES",
+  then_keyword: "HAGO",
 
   // Stats
   scan_with_ball: "Visión c/ pelota",
@@ -65,8 +65,8 @@ export const es = {
   dribbled_balls: "Regates Exitosos - Fallidos: ",
 
   // Roguelike
-  rogue_mode_btn: "Roguelike",
-  sim_mode_btn: "Simulación",
+  rogue_mode_btn: "Modo roguelike",
+  sim_mode_btn: "Modo simulación",
   rogue_turn: "Turno",
   rogue_max_rules: "Reglas máx",
   rogue_play_btn: "Jugar turno",

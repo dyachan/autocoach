@@ -273,6 +273,14 @@ export class TeamFormationComponent {
     this.root.querySelector('.team-name').disabled = !editable;
   }
 
+  setColorPickerVisible(visible) {
+    this.root.querySelector('.team-color-picker').style.display = visible ? null : 'none';
+  }
+
+  getColor() {
+    return this.root.querySelector('.team-color-picker').value;
+  }
+
   setCounters(counters) {
     const el = this.root.querySelector('.other-team-counters');
     if (!counters) { el.textContent = ''; return; }

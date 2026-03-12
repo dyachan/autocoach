@@ -121,6 +121,16 @@ select {
   padding: var(--gap-small);
 }
 
+.matchcontrols{
+  width: 100%;
+}
+
+.matchcontrols label{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .matchcontrols button{
   min-width: 50px;
   min-height: 30px;
@@ -330,7 +340,7 @@ select {
   flex-direction: column;
   gap: var(--gap);
   align-items: center;
-  padding: var(--gap-small);
+  padding: 0 var(--gap-small) var(--gap-small) var(--gap-small);
 }
 
 .matchinfo > fieldset{
@@ -460,4 +470,44 @@ button:disabled .loader{
 
 #rogue-congrats-close {
   margin-top: var(--gap);
+}
+
+.matchcontrols .menu{
+  padding: var(--gap);
+  background-color: var(--background-panel-color);
+  border-radius: 0 0 var(--gap) var(--gap);
+  border: var(--primary-background-color) solid thin;
+  border-top: none;
+  margin-bottom: var(--gap);
+  width: 90%;
+  justify-content: space-around;
+}
+
+.tactic-container{
+  position: relative;
+}
+
+.tactic-panel{
+  position: absolute;
+  background-color: var(--background-color);
+  width: 200px;
+  height: 100px;
+  z-index: 10;
+  top: 30px;
+  left: -30px;
+  border-radius: var(--gap);
+  border: var(--primary-background-color) solid thin;
+  padding: var(--gap);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: end;
+}
+.tactic-container .tactic-panel hr,
+.tactic-container .tactic-panel select {
+  width: 100%;
+}
+.tactic-container .tactic-panel input {
+  width: 90%;
 }

@@ -22,7 +22,10 @@ function updateFieldPreview() {
   const teamBVisible = teamA.root.style.display === "none";
   const team = teamBVisible ? teamB : teamA;
   const teamdata = team.getTeamData();
-  const color = teamBVisible ? "#b676ff" : "#fd9946";
+  const style = getComputedStyle(document.documentElement);
+  const color = teamBVisible
+    ? style.getPropertyValue('--team-B-color').trim()
+    : style.getPropertyValue('--team-A-color').trim();
 
   render.renderField();
   teamdata.players.forEach((player, i) => {
@@ -152,13 +155,26 @@ langSwitcher.addEventListener("change", (e) => setLocale(e.target.value));
 // =====================
 // MODO ROGUELIKE
 // =====================
+function _applyTeamColor(prefix, hex) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const bg = `#${[r, g, b].map(c => Math.round(c * 0.44).toString(16).padStart(2, '0')).join('')}`;
+  document.documentElement.style.setProperty(`--${prefix}-color`, hex);
+  document.documentElement.style.setProperty(`--${prefix}-background-color`, bg);
+}
+function setTeamAColor(hex) { _applyTeamColor('team-A', hex); }
+function setTeamBColor(hex) { _applyTeamColor('team-B', hex); }
 const rogueSession = new RoguelikeSession();
 let rogueUI = null;
 let isRoguelikeMode = false;
+let _colorPickerHandler = null;
 
 const toggleModeBtn = document.getElementById("btn-toggle-mode");
 
 function enterRoguelikeMode() {
+  matchPlayer.pause();
+  matchPlayer.load(null, null);
   rogueSession.reset();
   isRoguelikeMode = true;
   toggleModeBtn.textContent = t('sim_mode_btn');
@@ -169,6 +185,14 @@ function enterRoguelikeMode() {
   teamA.setNameEditable(true);
   teamB.setCounters(null);
   teamA.setRoguelikeMode(rogueSession.maxRulesPerSection);
+  teamA.setColorPickerVisible(true);
+  const colorPicker = teamA.root.querySelector('.team-color-picker');
+  setTeamAColor(colorPicker.value);
+  _colorPickerHandler = (e) => {
+    setTeamAColor(e.target.value);
+    updateFieldPreview();
+  };
+  colorPicker.addEventListener('input', _colorPickerHandler);
   teamB.setRoguelikeMode(rogueSession.maxRulesPerSection);
   teamB.setReadOnly(true);
 
@@ -223,13 +247,26 @@ function exitRoguelikeMode() {
 
   teamA.exitRoguelikeMode();
   teamA.setNameEditable(false);
+  teamA.setColorPickerVisible(false);
   teamA.setReadOnly(false);
+  const colorPicker = teamA.root.querySelector('.team-color-picker');
+  if (_colorPickerHandler) {
+    colorPicker.removeEventListener('input', _colorPickerHandler);
+    _colorPickerHandler = null;
+  }
+  document.documentElement.style.removeProperty('--team-A-color');
+  document.documentElement.style.removeProperty('--team-A-background-color');
+  document.documentElement.style.removeProperty('--team-B-color');
+  document.documentElement.style.removeProperty('--team-B-background-color');
 
   teamB.exitRoguelikeMode();
   teamB.setReadOnly(false);
   teamB.setCounters(null);
 
   document.querySelectorAll('.btn-change-team').forEach(b => b.style.display = null);
+  matchPlayer.pause();
+  matchPlayer.load(null, null);
+  updateFieldPreview();
 }
 
 toggleModeBtn.addEventListener("click", () => {
@@ -250,14 +287,16 @@ async function handleRoguePlay() {
       body: JSON.stringify({
         name:         (teamA.getTeamName() || Date.now()),
         player_names: teamData.players.map(p => p.name),
+        color:        teamA.getColor(),
       }),
     }).then(r => r.json());
     rogueSession.setTeamId(res.game_team_id);
     rogueSession.setPlayerIds(res.players.map(p => p.id));
   }
 
-  // Lock team name — name is set on first play and cannot change afterwards
+  // Lock team name and color — set on first play and cannot change afterwards
   teamA.setNameEditable(false);
+  teamA.setColorPickerVisible(false);
 
   // Enviar stats + zonas + reglas en un solo request
   const playersPayload = teamData.players.map((p, i) => ({
@@ -309,6 +348,7 @@ async function handleRoguePlay() {
   teamB.root.querySelector('.team-name').value = data.opponent.name;
   teamB.loadTeamData({ players: data.opponent.players });
   teamB.setCounters(data.opponent);
+  if (data.opponent.color) setTeamBColor(data.opponent.color);
   document.querySelectorAll('.btn-change-team').forEach(b => b.style.display = null);
 
   rogueUI.showResult(data.result, data.goals_for, data.goals_against, data.opponent.name);

@@ -97,7 +97,11 @@ export class RenderComponent {
   update(instant) {
     this.renderField();
 
-    const teamColors = ["#fd9946", "#b676ff"];
+    const style = getComputedStyle(document.documentElement);
+    const teamColors = [
+      style.getPropertyValue('--team-A-color').trim(),
+      style.getPropertyValue('--team-B-color').trim(),
+    ];
     ["teamA", "teamB"].forEach((team, i) => {
       instant[team].forEach(p => {
         this.renderPlayer(

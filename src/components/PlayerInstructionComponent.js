@@ -108,10 +108,18 @@ export class PlayerInstructionComponent {
 
     // Tactic panel
     const tacticPanel = container.querySelector(".tactic-panel");
-    container.querySelector(".btn-tactic").addEventListener("click", () => {
+    const btnTactic = container.querySelector(".btn-tactic");
+    btnTactic.addEventListener("click", () => {
       const visible = tacticPanel.style.display !== "none";
       tacticPanel.style.display = visible ? "none" : null;
       if (!visible) this._refreshTacticSelect();
+    });
+    document.addEventListener("click", (e) => {
+      if (tacticPanel.style.display !== "none"
+          && !tacticPanel.contains(e.target)
+          && e.target !== btnTactic) {
+        tacticPanel.style.display = "none";
+      }
     });
     container.querySelector(".tactic-name-input").placeholder = t("tactic_name_placeholder");
     container.querySelector(".btn-load-tactic").addEventListener("click", () => this._loadSelectedTactic());

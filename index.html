@@ -14,13 +14,13 @@
   <main>
     <section class="matchpanel">
       <article class="matchcontrols">
-        <label>
+        <label class="menu">
           <select id="lang-switcher">
             <option value="en">EN</option>
             <option value="es">ES</option>
             <option value="fr">FR</option>
           </select>
-          <button id="btn-toggle-mode">Roguelike</button>
+          <button id="btn-toggle-mode" data-i18n="rogue_mode_btn">Roguelike</button>
         </label>
 
         <label>
@@ -62,6 +62,7 @@
         <label>
           <p data-i18n="name_label">Name</p>
           <input class="team-name"></input>
+          <input type="color" class="team-color-picker" value="#fd9946" style="display:none">
           <div style="flex-grow: 2;"></div>
           <button class="btn-upload-team">
             <span class="team-message" style="display: none;"></span>
@@ -108,17 +109,14 @@
         <label>
           <span class="player-name">Player</span>
         </label>
-        <label>
+        <label class="tactic-container">
           <button class="btn-tactic" data-i18n="tactic_button"></button>
           <div class="tactic-panel" style="display:none">
-            <div class="tactic-panel-load">
               <select class="tactic-select"></select>
               <button class="btn-load-tactic" data-i18n="tactic_load"></button>
-            </div>
-            <div class="tactic-panel-save">
+              <hr />
               <input class="tactic-name-input" type="text">
               <button class="btn-save-tactic" data-i18n="tactic_save"></button>
-            </div>
           </div>
         </label>
         <label>

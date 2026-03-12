@@ -65,8 +65,8 @@ export const fr = {
   dribbled_balls: "Dribbles Réussis - Ratés : ",
 
   // Roguelike
-  rogue_mode_btn: "Roguelike",
-  sim_mode_btn: "Simulation",
+  rogue_mode_btn: "Mode roguelike",
+  sim_mode_btn: "Mode simulation",
   rogue_turn: "Tour",
   rogue_max_rules: "Règles max",
   rogue_play_btn: "Jouer le tour",
@@ -107,7 +107,7 @@ export const fr = {
   // Actions
   act_stay_in_zone: "Rester dans ma zone",
   act_go_to_ball: "Aller au ballon",
-  act_go_to_near_rival: "Aller vers l'adversaire proche",
+  act_go_to_near_rival: "Aller vers l'adversaire",
   act_go_to_my_goal: "Aller à mon but",
   act_go_to_rival_goal: "Aller au but adverse",
   act_go_forward: "Avancer",

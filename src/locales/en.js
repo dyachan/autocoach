@@ -65,8 +65,8 @@ export const en = {
   dribbled_balls: "Dribbled balls Successful - Failed: ",
 
   // Roguelike
-  rogue_mode_btn: "Roguelike",
-  sim_mode_btn: "Simulation",
+  rogue_mode_btn: "Roguelike mode",
+  sim_mode_btn: "Simulation mode",
   rogue_turn: "Turn",
   rogue_max_rules: "Max rules",
   rogue_play_btn: "Play turn",
