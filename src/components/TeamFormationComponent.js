@@ -93,10 +93,12 @@ export class TeamFormationComponent {
       titleEl.classList.add("teamacolor");
       btnSelectTeam.classList.add("teamabgcolor");
       container.querySelector(".btn-change-team").classList.add("teambbgcolor");
+      container.querySelector(".other-team-counters").classList.add("teamacolor");
     } else {
       titleEl.classList.add("teambcolor");
       btnSelectTeam.classList.add("teambbgcolor");
       container.querySelector(".btn-change-team").classList.add("teamabgcolor");
+      container.querySelector(".other-team-counters").classList.add("teambcolor");
     }
     
     this.root = container;

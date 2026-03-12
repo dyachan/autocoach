@@ -212,6 +212,7 @@ function enterRoguelikeMode() {
 
 const congratsOverlay = document.getElementById('rogue-congrats-overlay');
 let _pendingOverlay = null; // { type: 'pioneer'|'gameover', team }
+let _pendingTeamCounters = null; // post-match counters to apply on next turn
 
 document.getElementById('rogue-congrats-close').addEventListener('click', () => {
   congratsOverlay.style.display = 'none';
@@ -333,7 +334,10 @@ async function handleRoguePlay() {
     return;
   }
 
+  // Capture pre-match counters before applying result
+  teamA.setCounters({ wins: rogueSession.wins, draws: rogueSession.draws, losses: rogueSession.losses, matches_played: rogueSession.matchesPlayed });
   rogueSession.applyMatchResult(data);
+  _pendingTeamCounters = data.team;
 
   // Reproducir replay
   document.getElementById("pausebutton").disabled = false;
@@ -349,7 +353,6 @@ async function handleRoguePlay() {
   teamA.setReadOnly(true);
   teamB.root.querySelector('.team-name').value = data.opponent.name;
   teamB.loadTeamData({ players: data.opponent.players });
-  teamA.setCounters(data.team);
   teamB.setCounters(data.opponent);
   if (data.opponent.color) setTeamBColor(data.opponent.color);
   document.querySelectorAll('.btn-change-team').forEach(b => b.style.display = null);
@@ -369,6 +372,8 @@ function _doNextTurn() {
   matchPlayer.pause();
   matchPlayer.load(null, null);
   updateFieldPreview();
+  teamA.setCounters(_pendingTeamCounters);
+  _pendingTeamCounters = null;
   teamA.setReadOnly(false);
   teamA.setNameEditable(false);
   teamA.startNewTurnDistribution(0.5);
@@ -380,7 +385,7 @@ function handleRogueNext() {
   if (_pendingOverlay) {
     const { type, team } = _pendingOverlay;
     if (type === 'gameover') {
-      showCongratsPanel(t('rogue_game_over'), '', team);
+      showCongratsPanel(t('rogue_game_over'), t('rogue_game_over_subtitle'), team);
     } else {
       showCongratsPanel(t('rogue_congrats_title'), t('rogue_congrats_subtitle'), team);
     }

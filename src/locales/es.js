@@ -74,6 +74,7 @@ export const es = {
   rogue_next_btn: "Siguiente turno",
   rogue_reset_btn: "Nueva partida",
   rogue_game_over: "FIN DEL JUEGO",
+  rogue_game_over_subtitle: "Has acumulado 5 derrotas.",
   rogue_distribute: "Distribuye 0.5 stats por jugador, luego:",
   rogue_result_win: "Victoria",
   rogue_result_loss: "Derrota",

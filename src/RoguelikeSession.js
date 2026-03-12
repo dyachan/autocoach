@@ -10,7 +10,7 @@ export class RoguelikeSession {
   }
 
   get isStarted()  { return this.teamId !== null; }
-  get isGameOver() { return this.losses >= 5; }
+  get isGameOver() { return this.losses >= 1; }
 
   /** 1 rule at turn 0, +1 every 3 completed turns */
   get maxRulesPerSection() {

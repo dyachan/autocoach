@@ -27,8 +27,8 @@ export class RoguelikeUI {
     }
 
     this._show('turn');
-    r.querySelector('#rogue-turn-label').textContent = `${s.turn} = `;
-    r.querySelector('#rogue-record-label').textContent = `${s.wins} + ${s.draws} + ${s.losses} (/5)`;
+    // r.querySelector('#rogue-turn-label').textContent = `${s.turn} = `;
+    // r.querySelector('#rogue-record-label').textContent = `${s.wins} + ${s.draws} + ${s.losses} (/5)`;
     const playBtn = r.querySelector('#rogue-play-btn');
     playBtn.querySelector('.btn-label').textContent = s.isStarted ? t('rogue_play_btn') : t('rogue_create_btn');
     playBtn.disabled = false;
