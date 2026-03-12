@@ -27,8 +27,8 @@ export const es = {
   // Instrucciones de jugador
   default_zone: "ZONA POR DEFECTO",
   while_keyword: "MIENTRAS",
-  team_has_ball: "El equipo tiene la pelota",
-  add_rule: "+ Agregar Regla",
+  team_has_ball: "Equipo con pelota",
+  add_rule: "+ una Regla",
   default_keyword: "POR DEFECTO",
   else_keyword: "SINO",
   stats_button: "stats",
@@ -87,6 +87,20 @@ export const es = {
   rogue_tutorial_stat_body: "Cada jugador puede distribuir 0.5 puntos de stat por turno.",
   rogue_tutorial_rules_title: "Más experiencia",
   rogue_tutorial_rules_body: "Cada 3 turnos los jugadores crecen y pueden recibir más órdenes.",
+
+  // Registro de partido
+  log_goal: "¡marca un gol!",
+  log_goal_player: "¡{player} marca un gol!",
+  log_autogoal: "autogol de {player}",
+  log_reset_ball: "pelota reiniciada",
+  log_pass: "{player} pasa a {target}",
+  log_shoot: "{player} dispara al arco",
+  log_intercept: "{player} intercepta la pelota",
+  log_control: "{player} controla la pelota",
+  log_bounce: "la pelota sale despedida",
+  log_steal: "{player} le roba a {target}",
+  log_takeoff: "{player} le arrebata a {target}",
+  log_dribble: "{player} regatea a {target}",
 
   // Roles (solo se muestra la primera letra en el canvas)
   goalkeeper: "Portero",

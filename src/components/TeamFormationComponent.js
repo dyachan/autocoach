@@ -255,7 +255,7 @@ export class TeamFormationComponent {
     this.root.querySelector('.btn-select-team').style.display = null;
     this.root.querySelector('.team-selection').style.display = null;
     this.root.querySelector('.btn-change-team').style.display = null;
-    this.players.forEach(p => p.setMaxRules(undefined));
+    this.players.forEach(p => { p.setMaxRules(undefined); p.resetToSimulatorMode(); });
   }
 
   /**

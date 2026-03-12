@@ -28,7 +28,7 @@ export const fr = {
   default_zone: "ZONE PAR DÉFAUT",
   while_keyword: "TANT QUE",
   team_has_ball: "L'équipe a le ballon",
-  add_rule: "+ Ajouter une règle",
+  add_rule: "+ une règle",
   default_keyword: "PAR DÉFAUT",
   else_keyword: "SINON",
   stats_button: "stats",
@@ -87,6 +87,20 @@ export const fr = {
   rogue_tutorial_stat_body: "Chaque joueur peut distribuer 0,5 points de stat par tour.",
   rogue_tutorial_rules_title: "Plus d'expérience",
   rogue_tutorial_rules_body: "Tous les 3 tours les joueurs grandissent et peuvent recevoir plus d'ordres.",
+
+  // Journal de match
+  log_goal: "marque un but !",
+  log_goal_player: "{player} marque un but !",
+  log_autogoal: "but contre son camp par {player}",
+  log_reset_ball: "remise en jeu",
+  log_pass: "{player} passe à {target}",
+  log_shoot: "{player} tire au but",
+  log_intercept: "{player} intercepte le ballon",
+  log_control: "{player} contrôle le ballon",
+  log_bounce: "le ballon rebondit",
+  log_steal: "{player} vole le ballon à {target}",
+  log_takeoff: "{player} arrache le ballon à {target}",
+  log_dribble: "{player} dribble {target}",
 
   // Rôles (seule la première lettre s'affiche sur le canvas)
   goalkeeper: "Gardien",

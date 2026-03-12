@@ -88,6 +88,20 @@ export const en = {
   rogue_tutorial_rules_title: "More experience",
   rogue_tutorial_rules_body: "Every 3 turns players grow and can receive more orders.",
 
+  // Match log
+  log_goal: "scores a goal!",
+  log_goal_player: "{player} scores a goal!",
+  log_autogoal: "autogoal by {player}",
+  log_reset_ball: "ball reset",
+  log_pass: "{player} passes to {target}",
+  log_shoot: "{player} shoots to goal",
+  log_intercept: "{player} intercepts the ball",
+  log_control: "{player} controls the ball",
+  log_bounce: "ball bounces away",
+  log_steal: "{player} steals from {target}",
+  log_takeoff: "{player} takes off from {target}",
+  log_dribble: "{player} dribbles past {target}",
+
   // Roles (only first letter shown on canvas)
   goalkeeper: "Goalkeeper",
   defender: "Defender",

@@ -270,7 +270,7 @@ select {
 }
 .player-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: var(--gap-small);
 }
 .player-stats-grid label {
@@ -344,7 +344,7 @@ select {
 }
 
 .matchinfo > fieldset{
-  height: 590px;
+  height: 655px;
   overflow-y: scroll;
 }
 

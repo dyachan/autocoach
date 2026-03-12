@@ -85,9 +85,9 @@ export class PlayerInstructionComponent {
       element.textContent = t(this.actions[0].key);
     });
 
-    // Compute total budget
+    // No budget cap in simulator mode (null = unlimited)
     const statInputs = container.querySelectorAll(".stat-input");
-    this.maxTotal = statInputs.length * 0.5;
+    this.maxTotal = null;
 
     this.root = container;
     this.updateStatsDisplay();
@@ -128,10 +128,12 @@ export class PlayerInstructionComponent {
     // Update output label, enforce budget cap, and trigger update
     statInputs.forEach((input) => {
       input.addEventListener("input", () => {
-        const allInputs = Array.from(this.root.querySelectorAll(".stat-input"));
-        const sum = allInputs.reduce((acc, i) => acc + parseFloat(i.value), 0);
-        if (sum > this.maxTotal) {
-          input.value = Math.max(parseFloat(input.min || 0), Math.round((parseFloat(input.value) - (sum - this.maxTotal)) * 100) / 100);
+        if (this.maxTotal !== null) {
+          const allInputs = Array.from(this.root.querySelectorAll(".stat-input"));
+          const sum = allInputs.reduce((acc, i) => acc + parseFloat(i.value), 0);
+          if (sum > this.maxTotal) {
+            input.value = Math.max(parseFloat(input.min || 0), Math.round((parseFloat(input.value) - (sum - this.maxTotal)) * 100) / 100);
+          }
         }
         input.closest("label").querySelector("output").value = parseFloat(input.value).toFixed(2);
         this.updateStatsDisplay();
@@ -184,8 +186,9 @@ export class PlayerInstructionComponent {
   updateStatsDisplay() {
     const allInputs = Array.from(this.root.querySelectorAll(".stat-input"));
     const sum = allInputs.reduce((acc, i) => acc + parseFloat(i.value), 0);
-    this.root.querySelector(".stat-total-display").textContent =
-      `${Math.round(sum * 100) / 100} / ${this.maxTotal}`;
+    this.root.querySelector(".stat-total-display").textContent = this.maxTotal === null
+      ? `${Math.round(sum * 100) / 100}`
+      : `${Math.round(sum * 100) / 100} / ${this.maxTotal}`;
   }
 
   /** Create a new rule row */
@@ -329,6 +332,20 @@ export class PlayerInstructionComponent {
     this.updateStatsDisplay();
     this.loadRules([[], []]);
     this.lockCurrentStats();
+  }
+
+  /** Restores unlimited stats (simulator mode). Undoes roguelike locking. */
+  resetToSimulatorMode() {
+    this.maxTotal = null;
+    this.root.querySelectorAll('.stat-input').forEach(input => {
+      input.disabled = false;
+      input.min = 0;
+      input.style.width = '';
+      const lockedEl = input.closest('.stat-input-container')?.querySelector('.locked-stat');
+      if (lockedEl) lockedEl.style.width = '';
+    });
+    this._lockedStats = {};
+    this.updateStatsDisplay();
   }
 
   /** Disables the "+ Add Rule" button once the container reaches n rules. */

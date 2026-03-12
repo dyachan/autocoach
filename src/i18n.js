@@ -6,9 +6,10 @@ const locales = { en, es, fr };
 
 let currentLocale = localStorage.getItem('lang') || 'en';
 
-/** Returns the translated string for the given key in the current locale. */
-export function t(key) {
-  return locales[currentLocale]?.[key] ?? locales['en'][key] ?? key;
+/** Returns the translated string for the given key in the current locale, with optional param interpolation. */
+export function t(key, params = {}) {
+  const template = locales[currentLocale]?.[key] ?? locales['en'][key] ?? key;
+  return template.replace(/\{(\w+)\}/g, (_, k) => params[k] ?? `{${k}}`);
 }
 
 /** Returns the current locale code (e.g. 'en', 'es'). */

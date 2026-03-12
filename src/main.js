@@ -183,6 +183,7 @@ function enterRoguelikeMode() {
   setSimulateBtns(true, 'none');
   teamA.setReadOnly(false);
   teamA.setNameEditable(true);
+  teamA.setCounters(null);
   teamB.setCounters(null);
   teamA.setRoguelikeMode(rogueSession.maxRulesPerSection);
   teamA.setColorPickerVisible(true);
@@ -259,6 +260,7 @@ function exitRoguelikeMode() {
   document.documentElement.style.removeProperty('--team-B-color');
   document.documentElement.style.removeProperty('--team-B-background-color');
 
+  teamA.setCounters(null);
   teamB.exitRoguelikeMode();
   teamB.setReadOnly(false);
   teamB.setCounters(null);
@@ -347,6 +349,7 @@ async function handleRoguePlay() {
   teamA.setReadOnly(true);
   teamB.root.querySelector('.team-name').value = data.opponent.name;
   teamB.loadTeamData({ players: data.opponent.players });
+  teamA.setCounters(data.team);
   teamB.setCounters(data.opponent);
   if (data.opponent.color) setTeamBColor(data.opponent.color);
   document.querySelectorAll('.btn-change-team').forEach(b => b.style.display = null);

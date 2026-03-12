@@ -1,3 +1,5 @@
+import { t } from './i18n.js';
+
 export class LogSystem {
   constructor(containerEl, getTeamAName, getTeamBName) {
     this.el = containerEl;
@@ -39,16 +41,15 @@ export class LogSystem {
     btn.addEventListener("click", () => this.onSeekTick?.(thisTick));
 
     const teamEl = node.querySelector(".log-team");
-    if (log.startsWith("Team A")) {
+    if (log.team === "A") {
       teamEl.classList.add("teamacolor");
       teamEl.textContent = this.getTeamAName();
-    } else if (log.startsWith("Team B")) {
+    } else if (log.team === "B") {
       teamEl.classList.add("teambcolor");
       teamEl.textContent = this.getTeamBName();
     }
 
-    node.querySelector(".log-msg").textContent =
-      log.replace("Team A", "").replace("Team B", "");
+    node.querySelector(".log-msg").textContent = t(log.key, log);
 
     this.el.insertBefore(node.querySelector(".log-item"), this.el.firstChild);
     this.maxTickLog = this.currentTick;
